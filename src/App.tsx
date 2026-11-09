@@ -93,12 +93,13 @@ function AppContent() {
             <Route caseSensitive path="/youth/qr" element={<DemoQr />} />
           </Route>
           <Route caseSensitive path="/youth/help" element={<Navigate to="/youth#faq" replace />} />
+          {(['terms', 'privacy', 'accessibility'] as const).map((page, index) => <Route key={page} caseSensitive path={`/youth/${page}`} element={<main id="main-content" className="container account-main"><Link className="back-link" to="/youth">Back to home</Link><h1>{['Terms of Service', 'Privacy Policy', 'Accessibility'][index]}</h1><p>Sample page for design preview. Final content will be added here.</p><Link to="/youth#contact">Contact Barangay Talipapa</Link></main>} />)}
           <Route caseSensitive path="/admin/youth/demo" element={<RegistryDemo />} />
           <Route caseSensitive path="/youth/*" element={<CivicLanding />} />
           <Route caseSensitive path="/admin/youth/*" element={<AdminPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes><RecoveryRoute /></>;
-  return <div className={`site-shell ${isStaff ? 'staff-shell' : ''}`}><nav aria-label="Design previews" style={{padding: 12, background: "#fff3cc", display: "flex", gap: 16, flexWrap: "wrap"}}><strong>Fictional design preview</strong><Link to="/youth">Home</Link><Link to="/youth/dashboard">Dashboard</Link><Link to="/youth/profiling">Profiling</Link><Link to="/youth/profile">Profile</Link><Link to="/youth/settings">Settings</Link><Link to="/youth/qr">ID</Link><Link to="/admin/youth/dashboard">Staff</Link><Link to="/admin/youth/demo">Registry</Link><Link to="/admin/youth/reports">Analytics</Link><Link to="/youth/demo/sign-in">Sign in</Link><Link to="/youth/demo/create-account">Sign up</Link></nav><a className="skip-link" href="#main-content">Skip to content</a><CivicScroll />{isStaff ? <StaffShell>{pages}</StaffShell> : <><CivicHeader />{pages}<CivicFooter /></>}</div>;
+  return <div className={`site-shell ${isStaff ? 'staff-shell' : ''}`}><a className="skip-link" href="#main-content">Skip to content</a><CivicScroll />{isStaff ? <StaffShell>{pages}</StaffShell> : <><CivicHeader />{pages}<CivicFooter /></>}</div>;
 }
 
 export default function App() {

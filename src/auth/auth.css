@@ -12,7 +12,7 @@
 .staff-signout:disabled { opacity: .6; cursor: wait; }
 .staff-live-counts { display: flex; flex-wrap: wrap; gap: 1.5rem; }
 .staff-live-counts dt { color: #425570; }
-.staff-live-counts dd { margin: .25rem 0 0; font-weight: 700; font-variant-numeric: tabular-nums; }
+.staff-live-counts dd { margin: .25rem 0 0; font-weight: 400; font-variant-numeric: tabular-nums; }
 .staff-live-records { list-style: none; padding: 0; }
 .staff-live-records li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid #dce5ef; overflow-wrap: anywhere; }
 .staff-live-answers { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 1rem; }
@@ -26,7 +26,7 @@
 .youth-saved-review, .staff-activity { margin-block: 1.5rem; }
 
 .password-code-help { margin-top: 24px; padding-top: 20px; border-top: 1px solid #d4e2f0; }
-.password-code-help h2 { margin: 0 0 6px; font-family: inherit; font-size: 1rem; font-weight: 700; }
+.password-code-help h2 { margin: 0 0 6px; font-family: inherit; font-size: 1rem; font-weight: 400; }
 .password-code-help p { margin: 0 0 12px; color: #345475; line-height: 1.6; }
 
 .account-form .confirmation-code-actions { display: flex; flex-direction: column; }

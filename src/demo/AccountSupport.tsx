@@ -16,8 +16,8 @@ const questions: [string, ReactNode][] = [
   ['Why is my information collected, and who can access it?', 'Your answers support youth profiling and SK program planning. Authorized staff can review submitted profiles and export approved records for their work. Public demographics show aggregate counts, not individual answers. Read the full Terms of Use and Data Privacy notice before completing your profile.'],
   ['How do I change my email or password, or recover my account?', <><strong>Change your password:</strong> use Account settings while signed in.<br /><strong>Forgot your password?</strong> Choose Forgot password on the sign-in page and follow the email-code steps.<br /><strong>Change your email or lost email access?</strong> Visit the barangay office for staff-assisted recovery. Bring proof of account ownership and an email you can access. Staff must check ownership, and you must verify the replacement email before the change is complete. Your current email stays active until then.</>],
 ];
-export function FAQ() {
-  return <div className="faq-list">{questions.map(([question, answer]) => <details key={question}><summary>{question}</summary><p>{answer}</p></details>)}</div>;
+export function FAQ({ limit = questions.length }: { limit?: number }) {
+  return <div className="faq-list">{questions.slice(0, limit).map(([question, answer]) => <details key={question}><summary>{question}</summary><p>{answer}</p></details>)}</div>;
 }
 
 export default function AccountSupport({ settings = false, saved = false }: { settings?: boolean; saved?: boolean }) {

@@ -9,7 +9,12 @@ import { usePractice } from '../demo/PracticeStore';
 import UserMenu from '../demo/UserMenu';
 
 import { FAQ } from '../demo/AccountSupport';
-import { journeySteps } from '../demo/YouthJourney';
+const landingSteps = [
+  ['Create Account', 'Register and sign in.'],
+  ['Submit Profile', 'Fill in the 5 sections and click submit.'],
+  ['Wait for Review', 'Track your approval status on your dashboard.'],
+  ['Join Events', 'Browse and join SK community events.'],
+];
 import YouthIcon from '../demo/YouthIcon';
 import CivicPaperCorners from './CivicPaperCorners';
 
@@ -30,13 +35,19 @@ const barangayFacebook = 'https://www.facebook.com/profile.php?id=61573062877104
 
 
 
-type IconName = 'arrow' | 'down' | 'profile' | 'report' | 'calendar' | 'pin' | 'facebook' | 'menu' | 'close';
+type IconName = 'arrow' | 'down' | 'profile' | 'report' | 'calendar' | 'pin' | 'facebook' | 'menu' | 'close' | 'people' | 'youth' | 'graduate' | 'work' | 'phone' | 'mail';
 
 
 
 export function CivicIcon({ name }: { name: IconName }) {
 
   const paths: Record<IconName, React.ReactNode> = {
+    phone: <path d="M7 3H4a1 1 0 0 0-1 1c0 9 8 17 17 17a1 1 0 0 0 1-1v-3l-5-2-2 2a15 15 0 0 1-7-7l2-2-2-5Z" />,
+    mail: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 6 9 7 9-7" /></>,
+    people: <><circle cx="9" cy="7" r="3" /><path d="M3 21v-3a6 6 0 0 1 12 0v3m2-17a3 3 0 0 1 0 6m1 4a5 5 0 0 1 3 4v3" /></>,
+    youth: <><circle cx="12" cy="8" r="4" /><path d="M5 21v-2a7 7 0 0 1 14 0v2M10 8h.01M14 8h.01" /></>,
+    graduate: <><path d="m2 8 10-5 10 5-10 5L2 8Zm4 2v7c4 3 8 3 12 0v-7m4-2v8" /></>,
+    work: <><rect x="3" y="7" width="18" height="14" rx="2" /><path d="M8 7V3h8v4M3 12c6 4 12 4 18 0m-9 1v4" /></>,
 
     arrow: <path d="M5 12h14m-6-6 6 6-6 6" />,
 
@@ -86,22 +97,11 @@ function useSubmittedYouthDestination() {
   return practice.signedIn && practice.responses.some(item => item.key === practice.profileKey);
 }
 
-const manilaClock = new Intl.DateTimeFormat('en-PH', {
-  timeZone: 'Asia/Manila', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true,
-});
 
 function HeaderChevron() {
   return <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m2.5 5.5 5.5 5 5.5-5" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" /></svg>;
 }
 
-function CivicClock() {
-  const [now, setNow] = useState(() => new Date());
-  useEffect(() => {
-    const timer = window.setInterval(() => setNow(new Date()), 1000);
-    return () => window.clearInterval(timer);
-  }, []);
-  return <div className="civic-clock"><time dateTime={now.toISOString()}>{manilaClock.format(now)}</time><small>Manila time</small></div>;
-}
 
 export function CivicHeader() {
   const { state: youthState } = useYouthAuth();
@@ -246,7 +246,7 @@ export function CivicHeader() {
 
         <span><strong>SK-DigiTalipapa</strong><small>Barangay Talipapa</small></span>
 
-      </Link><CivicClock /></div>
+      </Link></div>
 
       <nav className={`civic-nav ${open ? 'is-open' : ''}`} id="primary-navigation" aria-label={isStaff ? 'Staff navigation' : 'Primary navigation'}>
 
@@ -304,9 +304,32 @@ export function CivicScroll() {
 
 
 type Demographics = { asOf: string; total: number; childYouth: number; coreYouth: number; youngAdult: number };
+const sampleDemographics: Demographics = { asOf: '', total: 474, childYouth: 76, coreYouth: 251, youngAdult: 147 };
+
+function CountUp({ value }: { value: number }) {
+  const [count, setCount] = useState(value);
+  useEffect(() => {
+    const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (motion.matches) { setCount(value); return; }
+    let frame = 0;
+    let start: number | undefined;
+    setCount(0);
+    const tick = (now: number) => {
+      start ??= now;
+      const progress = Math.min((now - start) / 1400, 1);
+      setCount(Math.round(value * (1 - (1 - progress) ** 3)));
+      if (progress < 1) frame = window.requestAnimationFrame(tick);
+    };
+    const finish = () => { if (motion.matches) { window.cancelAnimationFrame(frame); setCount(value); } };
+    frame = window.requestAnimationFrame(tick);
+    motion.addEventListener('change', finish);
+    return () => { window.cancelAnimationFrame(frame); motion.removeEventListener('change', finish); };
+  }, [value]);
+  return <span aria-hidden="true">{count.toLocaleString('en-PH')}</span>;
+}
 
 function CommunityDemographics() {
-  const [stats, setStats] = useState<Demographics | null>(null);
+  const [stats, setStats] = useState<Demographics | null>(client ? null : sampleDemographics);
   useEffect(() => {
     const api = client;
     if (!api) return;
@@ -319,17 +342,14 @@ function CommunityDemographics() {
     const timer = window.setInterval(refresh, 60_000);
     return () => { active = false; window.clearInterval(timer); };
   }, []);
-  return <section className="civic-demographics civic-paper" id="demographics" aria-labelledby="demographics-title">
+  return <section className="civic-demographics civic-paper" id="demographics" aria-label={client ? 'Youth demographics' : 'Youth demographics · Sample data'}>
     <div className="container">
-      <div className="civic-stat-intro">
-        <div><h2 id="demographics-title">Youth demographics</h2><p className="civic-demographics-note">Based on approved profiling submissions, not the barangay’s total youth population.</p></div>
-        {stats ? <p className="civic-stat-updated">As of <time dateTime={stats.asOf}>{stats.asOf}</time></p> : <p className="civic-stat-unavailable" role="status">Public statistics are currently unavailable.</p>}
-      </div>
+      {!stats && <p role="status">Public statistics are currently unavailable.</p>}
       {stats && <dl className="civic-statistics">
-        <div><dt>Approved youth profiles <small>Ages 15–30</small></dt><dd>{stats.total}</dd></div>
-        <div><dt>Child Youth <small>Ages 15–17</small></dt><dd>{stats.childYouth}</dd></div>
-        <div><dt>Core Youth <small>Ages 18–24</small></dt><dd>{stats.coreYouth}</dd></div>
-        <div><dt>Young Adult <small>Ages 25–30</small></dt><dd>{stats.youngAdult}</dd></div>
+        <div><CivicIcon name="people" /><dt title="Ages 15–30">Approved youth profiles</dt><dd aria-label={String(stats.total)}><CountUp value={stats.total} /></dd></div>
+        <div><CivicIcon name="youth" /><dt title="Ages 15–17">Child Youth</dt><dd aria-label={String(stats.childYouth)}><CountUp value={stats.childYouth} /></dd></div>
+        <div><CivicIcon name="graduate" /><dt title="Ages 18–24">Core Youth</dt><dd aria-label={String(stats.coreYouth)}><CountUp value={stats.coreYouth} /></dd></div>
+        <div><CivicIcon name="work" /><dt title="Ages 25–30">Young Adult</dt><dd aria-label={String(stats.youngAdult)}><CountUp value={stats.youngAdult} /></dd></div>
       </dl>}
     </div>
   </section>;
@@ -361,20 +381,16 @@ export default function CivicLanding() {
 
         <p>The Sangguniang Kabataan of Barangay Talipapa,<br className="desktop-break" /> District 6, Quezon City.</p>
 
-        <p className="civic-hero-description">Help shape youth programs in Talipapa.</p>
+
 
         <div className="civic-hero-actions"><Link className="button civic-primary" to={profilingTarget}>{hasSubmittedProfile ? 'Go to youth dashboard' : 'Start youth profiling'}<CivicIcon name="arrow" /></Link><Link className="civic-hero-secondary" to="/youth#services">Explore our services</Link></div>
 
-        <p className="civic-hero-demo">Your community, your services.</p>
 
       </div>
 
-      <div className="container civic-hero-bottom"><Link to="/youth#services">Discover your community<CivicIcon name="down" /></Link><span>Community photos · enhanced image</span></div>
 
     </section>
-
-
-
+    <CommunityDemographics />
     <section className="civic-services civic-paper civic-paper-framed" id="services" aria-labelledby="services-title">
       <CivicPaperCorners />
       <div className="container">
@@ -391,7 +407,7 @@ export default function CivicLanding() {
           const action = resolvingAccount ? 'Checking account…' : !signedIn ? 'Sign in to explore' : card.id === 'profiling' ? hasSubmittedProfile ? 'Open your dashboard' : 'Complete your profile' : 'See what’s coming';
           const titleId = `service-${card.id}-title`, actionId = `service-${card.id}-action`;
           return <article className="civic-service-card" key={card.id}>
-            <div className={`civic-service-art art-${card.id}`} aria-hidden="true"><span><CivicIcon name={card.icon} /></span></div>
+            <div className={`civic-service-art art-${card.id}`} aria-hidden="true" />
             <div className="civic-service-copy">
               <h3 id={titleId}>{card.title}</h3>
               <p>{card.description}</p>
@@ -413,25 +429,20 @@ export default function CivicLanding() {
 
 
     <section className="civic-how-it-works civic-paper" id="how-it-works" aria-labelledby="how-it-works-title">
-      <div className="container"><div className="civic-section-heading"><h2 id="how-it-works-title">How it works</h2><p>New here? Start with an account, then share your youth profile.</p></div>
-        <ol role="list">{journeySteps.map(([title, description], index) => <li key={title}><span className="how-step-marker" aria-hidden="true">{index === 4 ? <CivicIcon name="calendar" /> : <YouthIcon name={(['account', 'edit', 'check', 'clock'] as const)[index]} />}<small>{index + 1}</small></span><div className="how-step-copy"><h3>{index === 0 ? 'Create your account' : title}</h3><p>{index === 4 ? 'Discover SK events and take part in community activities.' : description}</p></div></li>)}</ol>
-        <aside className="how-community-banner" aria-labelledby="how-community-title">
-          <div><h3 id="how-community-title">Your voice. Our community.</h3><p>Your interests and ideas help shape a more active, connected Kabataang Talipapa.</p></div>
-          <span className="how-community-stamp" aria-hidden="true">Kabataang<strong>Talipapa</strong></span>
-        </aside>
+      <div className="container"><div className="civic-section-heading"><div><h2 id="how-it-works-title">How it works</h2><p>New here? Start with an account, then share your youth profile.</p></div><Link className="button how-start-cta" to={profilingTarget}>{hasSubmittedProfile ? 'Go to youth dashboard' : 'Start youth profiling'}<CivicIcon name="arrow" /></Link></div>
+        <ol role="list">{landingSteps.map(([title, description], index) => <li key={title}><span className="how-step-marker" aria-hidden="true">{index === 3 ? <CivicIcon name="calendar" /> : <YouthIcon name={(['account', 'edit', 'clock'] as const)[index]} />}<small>{index + 1}</small></span><div className="how-step-copy"><h3>{title}</h3><p>{description}</p></div></li>)}</ol>
 
       </div>
     </section>
-    <CommunityDemographics />
 
 
 
     <section className="civic-faq civic-paper" id="faq" aria-labelledby="faq-title">
       <div className="container civic-faq-layout">
 
-      <div className="civic-faq-intro"><h2 id="faq-title">How can we help?</h2><p>Find answers about youth profiling, staff review and your account.</p><Link className="civic-inline-link" to="/youth#contact">Contact barangay staff<CivicIcon name="arrow" /></Link></div>
+      <div className="civic-faq-intro"><div><h2 id="faq-title">How can we help?</h2><p>Get answers to common questions about youth profiling, submitting your information, and following your staff review status. Learn how to update your profile and manage your account.</p></div><Link className="button how-start-cta" to="/youth#contact">Contact barangay staff<CivicIcon name="arrow" /></Link></div>
 
-      <div className="civic-faq-questions"><h3>Frequently asked questions</h3><FAQ /></div>
+      <div className="civic-faq-questions"><FAQ limit={6} /></div>
       </div>
     </section>
 
@@ -441,9 +452,16 @@ export default function CivicLanding() {
 
       <div className="container civic-contact-layout">
 
-        <div className="civic-contact-info"><h2 id="contact-title">Visit Barangay Talipapa</h2><p>Find us in District 6, Quezon City.</p><div className="civic-location"><CivicIcon name="pin" /><div><h3>Barangay address</h3><p>{officeAddress}</p></div></div><a className="civic-inline-link" href={mapLink} target="_blank" rel="noreferrer">Open in Google Maps<CivicIcon name="arrow" /></a></div>
+        <div className="civic-contact-info">
+          <h2 id="contact-title">Visit Us at</h2><p>Find us in District 6, Quezon City.</p>
+          <div className="civic-location"><CivicIcon name="pin" /><div><h3>Barangay address</h3><p>506 Quirino Hwy, Novaliches,<br />Quezon City, 1116 Metro Manila</p></div></div>
 
-        <figure className="civic-map"><iframe title="Google map of the Barangay Talipapa area in Quezon City" src={`https://www.google.com/maps?q=${barangayCenter}&z=16&output=embed`} loading="lazy" referrerPolicy="no-referrer" allowFullScreen /><figcaption>Barangay area map · Open Google Maps for directions.</figcaption></figure>
+          <div className="civic-location"><CivicIcon name="phone" /><div><h3>Contact number</h3><p>0917 000 0000</p></div></div>
+
+          <div className="civic-location"><CivicIcon name="mail" /><div><h3>Email address</h3><p>hello@talipapa.example</p></div></div>
+        </div>
+
+        <figure className="civic-map"><a className="civic-map-link" href={mapLink} target="_blank" rel="noreferrer">Open in Google Maps<CivicIcon name="arrow" /></a><iframe title="Google map of the Barangay Talipapa area in Quezon City" src={`https://www.google.com/maps?q=${barangayCenter}&z=16&output=embed`} loading="lazy" referrerPolicy="no-referrer" allowFullScreen /></figure>
 
       </div>
 
@@ -465,11 +483,12 @@ export function CivicFooter() {
 
 
 
-      <div className="civic-footer-social"><h2>Stay connected</h2><div className="civic-social-pending"><a href={barangayFacebook} target="_blank" rel="noreferrer"><CivicIcon name="facebook" />SK Talipapa Facebook<CivicIcon name="arrow" /></a></div><Link to="/youth#contact">Location &amp; contact information<CivicIcon name="arrow" /></Link></div>
+      <div className="civic-footer-contact"><h2>Contact us</h2><p>{officeAddress}</p><div className="civic-contact-sample"><p>hello@talipapa.example<br />Phone: (02) 0000 0000<br />Monday–Friday, 8 AM–5 PM</p></div><Link className="civic-footer-contact-link" to="/youth#contact">Location &amp; directions<CivicIcon name="arrow" /></Link></div>
+      <div className="civic-footer-social"><h2>Social links</h2><div className="civic-social-pending"><a href={barangayFacebook} target="_blank" rel="noreferrer"><CivicIcon name="facebook" />SK Talipapa Facebook<CivicIcon name="arrow" /></a></div></div>
 
     </div>
 
-    <div className="container civic-footer-bottom"><p>© {new Date().getFullYear()} SK-DigiTalipapa · Sangguniang Kabataan of Barangay Talipapa</p><Link to="/admin/youth/login">Staff access</Link></div>
+    <div className="container civic-footer-bottom"><p>© {new Date().getFullYear()} SK-DigiTalipapa · Sangguniang Kabataan of Barangay Talipapa</p><nav className="civic-footer-legal" aria-label="Policies"><Link to="/youth/terms">Terms of Service</Link><Link to="/youth/privacy">Privacy Policy</Link><Link to="/youth/accessibility">Accessibility</Link></nav></div>
 
   </footer>;
 
