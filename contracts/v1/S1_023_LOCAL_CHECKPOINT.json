@@ -1,0 +1,137 @@
+{
+  "baseCommit": "c7500ef33023845efb98e660946c879617e7e260",
+  "branch": "codex/s1-auth-foundation",
+  "status": "UNCOMMITTED; ACCEPTED for bounded local synthetic backend/security after independent review; S1 technical domain suitability recorded; saved-synthetic notice human approval and S1 screen acceptance pending",
+  "hashDefinition": "SHA256 of sorted UTF-8 path + NUL + file SHA256 + LF entries; documentation excluded",
+  "contentCheckpointSha256": "caf3bc37b7603f706799ed18ee85a303267b6748b1d086a3587511dbeac771a2",
+  "files": [
+    {
+      "path": "contracts/v1/password.ts",
+      "sha256": "f83268a6e52a8a6225ee79cc48f07327e0a02a443454fcef1f4b18d0d1a54b8b"
+    },
+    {
+      "path": "contracts/v1/youth-fields.json",
+      "sha256": "00f744527235cb636745642452e43e41877242594622d3465f1eadf424edc858"
+    },
+    {
+      "path": "contracts/v1/youth.ts",
+      "sha256": "d14cc052f782642ff36211a9f2666e5ec032f88f1c53b163d65b34db97b1bf43"
+    },
+    {
+      "path": "package.json",
+      "sha256": "c46fa99013f4f2ba31080eeb1469c2cb5445423c91444f0804db89be1a18b771"
+    },
+    {
+      "path": "scripts/s1-test-helpers.mjs",
+      "sha256": "bc2fce4aa38d12f3b391e3d2aa429d9a1517a520663ab619d3e0af74df44490f"
+    },
+    {
+      "path": "scripts/test-authorization.mjs",
+      "sha256": "8957223639a1571b9b32c9555068d7707b1a491ce104e60118b237d3bf85fab3"
+    },
+    {
+      "path": "scripts/test-s1-auth-browser.mjs",
+      "sha256": "46c0d10eef72a3a49ab2a2936e7da39bfee3aa185d40e1d418836a56b5d2420c"
+    },
+    {
+      "path": "scripts/test-s1-onboarding.mjs",
+      "sha256": "d3cbd6b29b765af0b98d4e61279a23801f4837cb195632ff076f1b22318f87fb"
+    },
+    {
+      "path": "scripts/test-s1-replay.mjs",
+      "sha256": "68238cf856a3a63d4deb5bc39a8e6abd484b6ae212a55b148f8d49b511c6b53d"
+    },
+    {
+      "path": "scripts/tests/s1-adapters.test.mjs",
+      "sha256": "a69c84c242eff14bc7050d80d19b08f2740768aad98decf67bb5989f320c7125"
+    },
+    {
+      "path": "src/auth/youth-password.ts",
+      "sha256": "1b9e936eca4ba3c8247757f05946f106f0b7890c282e80ad5cadc87675777372"
+    },
+    {
+      "path": "src/auth/youth-service.ts",
+      "sha256": "d424838f41685e77b2191f4b64b6293674f49810962953326b44db2048e941e0"
+    },
+    {
+      "path": "supabase/config.toml",
+      "sha256": "8f3e975ae26a073eeb17bf2b5402d3a85c8e9566cd83e2766ce95ad7fefe1ddb"
+    },
+    {
+      "path": "supabase/migrations/20261021010000_s1_synthetic_onboarding.sql",
+      "sha256": "e5f6235e5a97c5338aef59bb2bdd8da6ade23dbe45b23b5331b4052b06ec157b"
+    },
+    {
+      "path": "supabase/migrations/20261021020000_s1_deferred_receipt_executor.sql",
+      "sha256": "cbc45ca56afb3b2bbdc6a9f512670b7314cd3fbeb2037898f1764f62b6bde9b2"
+    },
+    {
+      "path": "supabase/templates/recovery.html",
+      "sha256": "ad70c2c815e0b30bab3914b5a77a7a0799328fe2fe8eb7fa41d61930d425a456"
+    },
+    {
+      "path": "supabase/tests/s1-onboarding.sql",
+      "sha256": "f8447717c29ac0667e228f4f04072b0f99cdeadac18de3e645acdebe21e810fb"
+    }
+  ],
+  "sourceInputs": [
+    {
+      "repository": "skdt-s1-youth",
+      "path": "specs/S1-023-self-service-onboarding.md",
+      "sha256": "e968a94e4d65ae8d041bbfe8896bceea986cf78216876441f1757635d4d30c69"
+    },
+    {
+      "repository": "skdt-s1-youth",
+      "path": "supabase/proposals/consent-and-kk-reference.sql",
+      "sha256": "161fc6807d8733e69358c7d7a2ba3632fd7a84b1364df6cff9cb60aec3a5718b"
+    },
+    {
+      "repository": "skdt-s1-youth",
+      "path": "src/profiling/fields.ts",
+      "sha256": "f32907dc16dfd77ca15863d751c3820dd92a5037de424f7b76bb3e642b2da869"
+    },
+    {
+      "repository": "skdt-s1-youth",
+      "path": "src/profiling/validation.ts",
+      "sha256": "82599293b93b714f4fadb982506777bd873ed0f96de2dfc900b57500e5380935"
+    },
+    {
+      "repository": "skdt-s1-youth",
+      "path": "src/profiling/PrivacyNotice.tsx",
+      "sha256": "50095db0dbb36b79230da08b0f020c2163f65a6caf38b9a92955e445764b262c"
+    }
+  ],
+  "reviewedInitialCheckpoint": "46edbd5c99cb69d5ef5e6d954bebd253904d362519b7566b64b00de6d6fa940b",
+  "domainReview": {
+    "path": "C:/Users/Administrator/skdt-s1-youth/docs/S1_023_DOMAIN_REVIEW.md",
+    "sha256": "0128339db480f9cdf35bcac74566694726216bd4a50c54c106d5a6a6b451bafc",
+    "reviewedCheckpoint": "46edbd5c99cb69d5ef5e6d954bebd253904d362519b7566b64b00de6d6fa940b",
+    "disposition": "Technically suitable for bounded local synthetic first submission; notice approval and independent security acceptance required. Final delta changes password cleanup error handling and tests only; SQL/contracts/domain source inputs unchanged."
+  },
+  "securityReview": {
+    "reviewer": "Independent security-review subagent /root/security_review; not the implementing maintainer",
+    "disposition": "ACCEPT bounded local synthetic backend/security; no remaining blocking findings",
+    "acceptedCheckpoint": "caf3bc37b7603f706799ed18ee85a303267b6748b1d086a3587511dbeac771a2",
+    "record": "docs/history/S1_023_INDEPENDENT_SECURITY_REVIEW.md",
+    "recordSha256": "c504abd5391bbd7d3ff598566f416fc41495f2500c8b9a772cbd0df4ae657734",
+    "finding": "P2 successful password update plus thrown cleanup lost signOutRequired; resolved in final adapter and regression tests",
+    "independentlyExecuted": [
+      "17 file hashes + aggregate + five S1 input hashes",
+      "focused adapter tests 4/4 (six cleanup failure branches)",
+      "git diff --check"
+    ],
+    "inspectedMaintainerEvidence": [
+      "78/78 Node tests",
+      "required verify",
+      "actual Chrome/Auth 6 groups with preserved identity/session/refresh/access fingerprints",
+      "unchanged SQL checkpoint replay/security/lint evidence"
+    ],
+    "limits": [
+      "Synthetic local backend only",
+      "No saved-notice human approval",
+      "No S1 screen acceptance",
+      "No hosted/real-data/production acceptance",
+      "No commit/push/merge"
+    ]
+  }
+}

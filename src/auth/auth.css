@@ -1,0 +1,36 @@
+.auth-fields { border: 0; padding: 0; margin: 0; min-width: 0; }
+.auth-workspace { display: contents; }
+.auth-fields:disabled { opacity: .7; }
+.staff-login-form .auth-fields:disabled { opacity: 1; }
+.auth-fields button:disabled, .account-preview button:disabled { cursor: wait; }
+.auth-error, .account-preview > .auth-error { color: var(--color-red); background: #fff4f5; line-height: 1.6; padding: 1rem; border: 1px solid currentColor; border-radius: 10px; }
+.account-preview p { overflow-wrap: anywhere; }
+.account-preview .account-links { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1.5rem; }
+.staff-signout { display: flex; align-items: center; gap: .75rem; width: 100%; padding: .85rem 1rem; border: 0; background: transparent; color: inherit; font: inherit; text-align: start; cursor: pointer; }
+.staff-signout svg { width: 20px; height: 20px; }
+.staff-signout:hover { background: #123d70; }
+.staff-signout:disabled { opacity: .6; cursor: wait; }
+.staff-live-counts { display: flex; flex-wrap: wrap; gap: 1.5rem; }
+.staff-live-counts dt { color: #425570; }
+.staff-live-counts dd { margin: .25rem 0 0; font-weight: 700; font-variant-numeric: tabular-nums; }
+.staff-live-records { list-style: none; padding: 0; }
+.staff-live-records li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid #dce5ef; overflow-wrap: anywhere; }
+.staff-live-answers { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 1rem; }
+.staff-live-answers dd { margin: .4rem 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.staff-live-note { white-space: pre-wrap; overflow-wrap: anywhere; }
+.review-notice { margin-block: 1.5rem; }
+.review-notice p { max-width: 75ch; overflow-wrap: anywhere; }
+.staff-decision { margin-block: 1.5rem; padding-block: 1.5rem; border-block: 1px solid #d4e2f0; }
+.review-sharing-choice { display: flex; align-items: start; gap: .75rem; margin-block: 1.5rem; line-height: 1.6; }
+.review-sharing-choice input { flex: none; width: 20px; height: 20px; margin-top: .25rem; accent-color: var(--color-blue); }
+.youth-saved-review, .staff-activity { margin-block: 1.5rem; }
+
+.password-code-help { margin-top: 24px; padding-top: 20px; border-top: 1px solid #d4e2f0; }
+.password-code-help h2 { margin: 0 0 6px; font-family: inherit; font-size: 1rem; font-weight: 700; }
+.password-code-help p { margin: 0 0 12px; color: #345475; line-height: 1.6; }
+
+.account-form .confirmation-code-actions { display: flex; flex-direction: column; }
+.account-form .confirmation-code-actions > button, .password-code-help > button { width: 100%; }
+
+.password-code-help > .secondary-button { background: #e5eaf0; border-color: #bcc9d8; color: var(--color-navy); }
+.password-code-help > .secondary-button:hover:not(:disabled) { background: #d5dfe9; border-color: #91a8c0; }

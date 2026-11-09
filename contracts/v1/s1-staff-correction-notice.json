@@ -1,0 +1,11 @@
+{
+  "version": "synthetic-s1-030-staff-corrections-v1",
+  "title": "Fictional staff-recorded correction revisions",
+  "paragraphs": [
+    "This local demonstration uses fictional staff-encoded profiles. Any of the designated chairperson, treasurer or secretary may correct only requested fields and required dependent answers after Needs changes, then resubmit the same registration.",
+    "Earlier submitted answers, field-specific notes, decisions, actual staff attribution and server times remain in private history. Original encoder evidence remains separate. This attests staff activity only; it is not youth or guardian consent, a signature, identity verification or an account link.",
+    "Approved or Rejected records cannot be reopened. Paper acknowledgment and real collection remain outside this demonstration. Retention, withdrawal and deletion procedures remain unresolved.",
+    "Corrected family answers may include optional fictional sibling birthdates if supplied. Those dates and prior submitted revisions remain private review history; ages are recalculated using the server date in the Philippines. Full-section downloads require a separate explicit family/export scope acknowledgment."
+  ],
+  "checkbox": "I confirm this is a fictional staff-encoded record and agree to retain the attributed correction revisions and review history."
+}

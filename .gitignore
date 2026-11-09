@@ -1,0 +1,30 @@
+node_modules/
+dist/
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts
+
+# Local environment files may contain secrets; keep only the sanitized template.
+.env
+.env.*
+!.env.example
+
+# Editor, operating-system, and local log files.
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+*.log
+
+# Local design review captures; authored web assets live in public/.
+.impeccable/review/
+
+# Disposable local SQL experiment, excluded from the authoritative S1 delivery.
+database/

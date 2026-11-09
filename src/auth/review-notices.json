@@ -1,0 +1,26 @@
+{
+  "staff": {
+    "version": "synthetic-staff-activity-v1",
+    "paragraphs": [
+      "Each staff member uses a separate account. The approved chairperson, treasurer and secretary have equal business permissions and can read the same private activity for supported actions. The server records the authenticated actor with a historical display label/position, named action, record reference where applicable, outcome and server time. Full youth answers, decision notes, passwords and tokens are not included in this feed. Trusted local database/development operators can access underlying records.",
+      "Successful password authentication, including password reauthentication, is recorded separately from supported business actions. An Auth logout event means the provider committed a logout operation; its scope is not recorded and it does not prove every session ended or that the browser received confirmation. Failed provider transactions do not become successful login/logout entries. Token refresh, restored sessions, browser closure, power loss and inactivity do not create login/logout entries. These records do not measure hours worked or prove a person read a record.",
+      "Staff cannot edit/delete activity through the application. Earlier actor labels/positions remain when a display label changes or membership is deactivated. Generated demo profiles may later be removed through explicit selected-batch maintenance, while minimized activity and cleanup accountability are retained. General audit retention/deletion policy is not finalized; no deletion date or staff self-erasure control is promised. Revocation cannot erase information already viewed or copied. This is a local fictional test, not employee monitoring approval for real-person production use."
+    ],
+    "checkbox": null,
+    "title": "Shared synthetic staff activity — local development"
+  },
+  "youth": {
+    "version": "synthetic-s1-027-review-v1",
+    "paragraphs": [
+      "Use made-up information only. Do not enter or submit information about real people.",
+      "If you agree, the separately signed-in synthetic chairperson, treasurer and secretary have equal permission to read this submission and record one review outcome. Their private list shows your fictional name, internal record reference, submission time and synthetic review status. Selected detail includes all saved profiling answers, including fictional contact, address, RBI, family, disability and other personal claims. Private workload counts include submissions shared this way and their outcomes.",
+      "One of these staff members may record Approved, Needs changes or Rejected. Needs changes and Rejected require a note. You can see your own saved outcome, note and attributed history after signing in again. Needs changes is a saved request only: editing/resubmitting submitted answers is unavailable. Completed decisions cannot be reopened or changed in this version.",
+      "All three authorized staff can see the shared activity for supported work: the actual staff display label and position, action, internal record reference, outcome and server-recorded time. Review activity is saved with the decision. Full answers and decision notes are not included in that activity feed; authorized selected detail remains private. Your Auth account identifier is not displayed in the feed.",
+      "Approved remains a synthetic software-review outcome, not proof of identity, residency, eligibility or official KK registration. Equal business access does not grant infrastructure administration, arbitrary answer editing/deletion, account-link approval or public publication. The fictional practice login grants no database authority. Finance/events actions need their owners' separate backend rules; your youth answers are not made public or copied into another subsystem by this permission.",
+      "The server records your account, this notice version and acknowledgment time, and records each decision's authenticated staff actor, historical display label/position and server time. Stored data remains after reload or sign-out. Trusted development/database operators can access it. General retention, deletion and withdrawal procedures remain unresolved: there is no owner withdrawal/deletion control or promised deletion date. Separately generated demo batches can later be intentionally removed by trusted local maintenance; minimized staff activity and cleanup accountability remain. This is not permission to remove your manually created record.",
+      "Disabling or revoking staff access stops future checked requests but cannot erase previously viewed/copied data. Acknowledgment is not proof of reading or identity. This is local synthetic development, not real-person collection, official registration or public demographics."
+    ],
+    "checkbox": "I agree that the synthetic chairperson, treasurer and secretary may read this fictional submission, record one review outcome/note, and include its minimized review activity and outcome in private staff history and workload counts.",
+    "title": "Allow three synthetic staff members to read and review this fictional submission — local development"
+  }
+}

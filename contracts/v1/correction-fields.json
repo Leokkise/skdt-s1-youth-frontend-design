@@ -1,0 +1,177 @@
+[
+  {
+    "sectionId": "personal",
+    "fieldId": "surname",
+    "editable": true
+  },
+  {
+    "sectionId": "personal",
+    "fieldId": "firstName",
+    "editable": true
+  },
+  {
+    "sectionId": "personal",
+    "fieldId": "middleName",
+    "editable": true
+  },
+  {
+    "sectionId": "personal",
+    "fieldId": "suffix",
+    "editable": true
+  },
+  {
+    "sectionId": "personal",
+    "fieldId": "birthdate",
+    "editable": true
+  },
+  {
+    "sectionId": "personal",
+    "fieldId": "age",
+    "editable": false
+  },
+  {
+    "sectionId": "personal",
+    "fieldId": "gender",
+    "editable": true
+  },
+  {
+    "sectionId": "personal",
+    "fieldId": "lgbtqiaDetails",
+    "editable": true
+  },
+  {
+    "sectionId": "personal",
+    "fieldId": "civilStatus",
+    "editable": true
+  },
+  {
+    "sectionId": "personal",
+    "fieldId": "pwdDetails",
+    "editable": true
+  },
+  {
+    "sectionId": "household",
+    "fieldId": "contactNumber",
+    "editable": true
+  },
+  {
+    "sectionId": "household",
+    "fieldId": "houseNumber",
+    "editable": true
+  },
+  {
+    "sectionId": "household",
+    "fieldId": "street",
+    "editable": true
+  },
+  {
+    "sectionId": "household",
+    "fieldId": "subdivision",
+    "editable": true
+  },
+  {
+    "sectionId": "household",
+    "fieldId": "locality",
+    "editable": false
+  },
+  {
+    "sectionId": "household",
+    "fieldId": "rbiNumber",
+    "editable": true
+  },
+  {
+    "sectionId": "household",
+    "fieldId": "headOfFamily",
+    "editable": true
+  },
+  {
+    "sectionId": "household",
+    "fieldId": "siblings",
+    "editable": true
+  },
+  {
+    "sectionId": "household",
+    "fieldId": "ageGroup",
+    "editable": false
+  },
+  {
+    "sectionId": "education",
+    "fieldId": "education",
+    "editable": true
+  },
+  {
+    "sectionId": "education",
+    "fieldId": "workStatus",
+    "editable": true
+  },
+  {
+    "sectionId": "education",
+    "fieldId": "jobDescription",
+    "editable": true
+  },
+  {
+    "sectionId": "education",
+    "fieldId": "income",
+    "editable": true
+  },
+  {
+    "sectionId": "education",
+    "fieldId": "isOsy",
+    "editable": true
+  },
+  {
+    "sectionId": "education",
+    "fieldId": "osyFrom",
+    "editable": true
+  },
+  {
+    "sectionId": "education",
+    "fieldId": "osyTo",
+    "editable": true
+  },
+  {
+    "sectionId": "participation",
+    "fieldId": "children",
+    "editable": true
+  },
+  {
+    "sectionId": "participation",
+    "fieldId": "skVoter",
+    "editable": true
+  },
+  {
+    "sectionId": "participation",
+    "fieldId": "election2023",
+    "editable": true
+  },
+  {
+    "sectionId": "participation",
+    "fieldId": "nationalVoter",
+    "editable": true
+  },
+  {
+    "sectionId": "participation",
+    "fieldId": "organization",
+    "editable": true
+  },
+  {
+    "sectionId": "participation",
+    "fieldId": "kkAttendance",
+    "editable": true
+  },
+  {
+    "sectionId": "voice",
+    "fieldId": "suggestions",
+    "editable": true
+  },
+  {
+    "sectionId": "voice",
+    "fieldId": "message",
+    "editable": true
+  },
+  {
+    "sectionId": "voice",
+    "fieldId": "certification",
+    "editable": false
+  }
+]

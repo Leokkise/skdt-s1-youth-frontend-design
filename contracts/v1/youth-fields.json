@@ -1,0 +1,242 @@
+[
+  {
+    "id": "surname",
+    "required": true,
+    "options": null
+  },
+  {
+    "id": "firstName",
+    "required": true,
+    "options": null
+  },
+  {
+    "id": "middleName",
+    "required": false,
+    "options": null
+  },
+  {
+    "id": "suffix",
+    "required": false,
+    "options": null
+  },
+  {
+    "id": "birthdate",
+    "required": true,
+    "options": null
+  },
+  {
+    "id": "age",
+    "required": true,
+    "options": null
+  },
+  {
+    "id": "gender",
+    "required": true,
+    "options": [
+      "Male",
+      "Female",
+      "LGBTQIA+"
+    ]
+  },
+  {
+    "id": "lgbtqiaDetails",
+    "required": false,
+    "options": null
+  },
+  {
+    "id": "civilStatus",
+    "required": true,
+    "options": [
+      "Single",
+      "Married",
+      "Live-in",
+      "Widowed",
+      "Separated",
+      "Annulled"
+    ]
+  },
+  {
+    "id": "pwdDetails",
+    "required": false,
+    "options": null
+  },
+  {
+    "id": "contactNumber",
+    "required": true,
+    "options": null
+  },
+  {
+    "id": "houseNumber",
+    "required": true,
+    "options": null
+  },
+  {
+    "id": "street",
+    "required": true,
+    "options": null
+  },
+  {
+    "id": "subdivision",
+    "required": false,
+    "options": null
+  },
+  {
+    "id": "locality",
+    "required": true,
+    "options": null
+  },
+  {
+    "id": "rbiNumber",
+    "required": true,
+    "options": null
+  },
+  {
+    "id": "headOfFamily",
+    "required": true,
+    "options": null
+  },
+  {
+    "id": "siblings",
+    "required": false,
+    "options": null
+  },
+  {
+    "id": "ageGroup",
+    "required": true,
+    "options": [
+      "Child Youth (15 - 17 yrs old)",
+      "Core Youth (18 - 24 yrs old)",
+      "Young Adult (25 - 30 yrs old)"
+    ]
+  },
+  {
+    "id": "education",
+    "required": true,
+    "options": [
+      "Elementary Undergraduate",
+      "Elementary Graduate",
+      "High School Undergraduate",
+      "High School Graduate",
+      "Senior High School Undergraduate",
+      "Senior High School Completer",
+      "College Undergraduate",
+      "College Graduate",
+      "ALS Diploma (Elementary)",
+      "ALS Diploma (High School)",
+      "ALS Diploma (Senior High School)",
+      "Masters Level",
+      "Masters Graduate",
+      "Doctorate Level",
+      "Doctorate Graduate"
+    ]
+  },
+  {
+    "id": "workStatus",
+    "required": true,
+    "options": [
+      "Student",
+      "Working Student",
+      "Self-Employed",
+      "Employed",
+      "Unemployed",
+      "Business Owner",
+      "Currently looking for a Job",
+      "Not Interested in looking for a Job"
+    ]
+  },
+  {
+    "id": "jobDescription",
+    "required": false,
+    "options": null
+  },
+  {
+    "id": "income",
+    "required": false,
+    "options": [
+      "Below 10,000",
+      "10,000 to 15,000",
+      "16,000 to 20,000",
+      "More than 20,000"
+    ]
+  },
+  {
+    "id": "isOsy",
+    "required": false,
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "osyFrom",
+    "required": false,
+    "options": null
+  },
+  {
+    "id": "osyTo",
+    "required": false,
+    "options": null
+  },
+  {
+    "id": "children",
+    "required": true,
+    "options": [
+      "No",
+      "Yes, only 1",
+      "Yes, I have 2 kids",
+      "Yes, I have 3 kids",
+      "Yes, More than 4 kids"
+    ]
+  },
+  {
+    "id": "skVoter",
+    "required": true,
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "election2023",
+    "required": true,
+    "options": null
+  },
+  {
+    "id": "nationalVoter",
+    "required": true,
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "id": "organization",
+    "required": false,
+    "options": null
+  },
+  {
+    "id": "kkAttendance",
+    "required": true,
+    "options": [
+      "No",
+      "Yes",
+      "2 to 3 times",
+      "More than 4 times"
+    ]
+  },
+  {
+    "id": "suggestions",
+    "required": false,
+    "options": null
+  },
+  {
+    "id": "message",
+    "required": false,
+    "options": null
+  },
+  {
+    "id": "certification",
+    "required": true,
+    "options": null
+  }
+]
