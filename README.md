@@ -17,7 +17,7 @@ Open the localhost URL printed by Vite. Browse the youth preview at /youth/dashb
 
 Edit components in src/ and assets in public/. Existing branding and visual assets are included. Source interfaces used by these components remain under contracts/. This copy has fresh Git history and excludes original internal documents, environment files, backend SQL, local captures, dependencies and generated output.
 
-Backend configuration always returns null in this copy. No database, Docker, organization membership or credentials are required. Authentication, email delivery, saved accounts and privileged actions do not operate. Sign-in and signup show their disconnected presentation. Staff activity and recovery routes show explicit placeholders. The original components remain in src/auth/ for reference and further isolated mock design work.
+Backend configuration always returns null in this copy. No database, Docker, and organization membership or credentials are required. Authentication, email delivery, saved accounts and privileged actions do not operate. Sign-in and signup show their disconnected presentation. Staff activity and recovery routes show explicit placeholders. The original components remain in src/auth/ for reference and further isolated mock design work.
 
 This public design copy opens fictional staff previews directly. These preview changes belong only to this standalone copy. When transferring designs back, port visual changes and preserve the original application's server authorization and protected routing.
 
