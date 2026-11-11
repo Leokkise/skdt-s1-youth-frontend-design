@@ -17,7 +17,7 @@ const previewLimit = 5;
 const activityDate = new Intl.DateTimeFormat('en-CA', {timeZone: 'Asia/Manila', year: 'numeric', month: '2-digit', day: '2-digit'});
 const actorKey = (event: BusinessActivityEventV2) => JSON.stringify([event.actorLabel, event.position]);
 const actionDescription = (event: BusinessActivityEventV2) => event.action === 'password_sign_in' ? 'A successful password check was recorded. This may be a sign-in or a password confirmation; it does not identify a particular workspace visit.' : event.action === 'auth_logout_committed' ? 'The service recorded a sign-out operation. The record does not say whether one or all sessions were affected.' : undefined;
-const actionLabel = (event: BusinessActivityEventV2) => event.action === 'password_sign_in' ? 'Sign-in recorded' : event.action === 'auth_logout_committed' ? 'Sign-out recorded' : event.action === 'account_recovery' ? recoveryEventLabels[event.outcome as RecoveryEventV1['outcome']] : `Review outcome: ${reviewLabel(event.outcome)}`;
+const actionLabel = (event: BusinessActivityEventV2) => event.action === 'password_sign_in' ? 'Sign in' : event.action === 'auth_logout_committed' ? 'Sign out' : event.action === 'account_recovery' ? recoveryEventLabels[event.outcome as RecoveryEventV1['outcome']] : `Review outcome: ${reviewLabel(event.outcome)}`;
 
 function ActivityBadge({ event }: { event: BusinessActivityEventV2 }) {
   const tone = event.action === 'password_sign_in' ? 'info'
@@ -110,7 +110,7 @@ export default function StaffActivity({ denied, preview = false, pending = false
   const pages = activityPages(page, pageCount);
   const visible = preview ? filtered.slice(0, previewLimit) : filtered.slice(page * 10, (page + 1) * 10);
   const visibleBusy = busy && (!items || manualRefresh);
-  const refreshButton = <LoadingAction type="button" className="secondary-button activity-refresh" busy={visibleBusy} onClick={() => { setManualRefresh(true); setAttempt(value => value + 1); }}>Refresh activity</LoadingAction>;
+  const refreshButton = <LoadingAction iconOnly type="button" className="secondary-button activity-refresh" busy={visibleBusy} onClick={() => { setManualRefresh(true); setAttempt(value => value + 1); }}>Refresh activity</LoadingAction>;
   const content = <section className="profile-card staff-activity" aria-labelledby="staff-activity-title" aria-busy={busy}>
     <div className={preview ? 'activity-heading dashboard-panel-heading' : 'activity-heading'}><div>{preview ? <><YouthIcon name="clock" /><h2 id="staff-activity-title">Recent staff activity</h2></> : <h1 id="staff-activity-title">Activity Logs</h1>}</div>{preview ? <Link to="/admin/youth/activity">View logs<YouthIcon name="chevron" /></Link> : refreshButton}</div>
     {!preview && <>
@@ -120,7 +120,7 @@ export default function StaffActivity({ denied, preview = false, pending = false
     </>}
     {recoveryUnavailable && (scope === 'all' || scope === 'recovery') && <p role="status">Account recovery activity could not be loaded. Existing sign-in and registry activity is shown; refresh to retry.</p>}
     {availability?.recovery === 'denied' && (scope === 'all' || scope === 'recovery') && <p role="status">Account recovery activity is not available with your current access.</p>}
-    {scope === 'auth' && <details className="activity-auth-explanation"><summary>What do sign-in and sign-out records mean?</summary><p><strong>Sign-in recorded:</strong> a password check succeeded. This can be a sign-in or confirmation of a password.</p><p><strong>Sign-out recorded:</strong> the service processed a sign-out operation. The record does not say whether one or all sessions were affected.</p></details>}
+    {scope === 'auth' && <details className="activity-auth-explanation"><summary>What do sign-in and sign-out records mean?</summary><p><strong>Sign in:</strong> a password check succeeded. This can be a sign-in or confirmation of a password.</p><p><strong>Sign out:</strong> the service processed a sign-out operation. The record does not say whether one or all sessions were affected.</p></details>}
     {preview && <div className="activity-preview-columns"><span>Staff responsible &amp; activity</span><span>Date and time (PH)</span></div>}
     {busy && !items && !preview && <p aria-hidden="true"><SkeletonText>10 events · Showing 1–10</SkeletonText></p>}
     {busy && (items ? <span className="sr-only" role="status">Refreshing shared activity…</span> : preview ? <ActivityPreviewPending /> : <TableSkeleton variant={scope === 'auth' ? 'authActivity' : scope === 'recovery' ? 'recoveryActivity' : scope === 'all' ? 'combinedActivity' : 'activity'} label="Loading shared activity…" />)}{error && <p role="status">{error}</p>}

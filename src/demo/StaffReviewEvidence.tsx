@@ -15,23 +15,22 @@ export function ChangesRequested({ review }: { review: ReviewStateV2 }) {
   </section>;
 }
 
-export default function StaffReviewEvidence({ review, encoder }: { review: ReviewStateV2; encoder?: EncoderReceiptV1 | null }) {
-  return <div className="registry-evidence-grid">
+export default function StaffReviewEvidence({ review }: { review: ReviewStateV2; encoder?: EncoderReceiptV1 | null }) {
+  return <div className="registry-evidence-grid youth-review-timeline">
     <details className="review-history registry-history" open>
-      <summary><span className="registry-history-label"><YouthIcon name="chevron" />Review history</span><span>{review.history.length} {review.history.length === 1 ? 'decision' : 'decisions'}</span></summary>
-      {review.history.length ? <ol>{review.history.map(event => <li key={event.eventId}>
-        <span className="status-pill registry-evidence-status" data-decision={event.decision}>{reviewLabel(event.decision)}</span>
-        <p className="staff-live-note">{event.note || 'No review note.'}</p>
-        <p className="registry-review-meta"><strong>{displayLabel(event.actorLabel)}</strong> · {positionLabel(event.position)}<br /><time dateTime={event.recordedAt}>{manilaTime(event.recordedAt)} (PH)</time></p>
-      </li>)}</ol> : <p>No decision has been recorded.</p>}
+      <summary><span className="registry-history-label"><YouthIcon name="chevron" />Review history</span></summary>
+      {review.history.length ? review.history.map((event, index) => <article className="correction-history-round" key={event.eventId}>
+        <header className="correction-round-heading"><h4>Decision {review.history.length - index}</h4><span className="status-pill" data-review-status={event.decision}>{reviewLabel(event.decision)}</span></header>
+        <p className="registry-review-meta">{displayLabel(event.actorLabel)} · {positionLabel(event.position)} · <time dateTime={event.recordedAt}>{manilaTime(event.recordedAt)} (PH)</time></p>
+        {event.note && <p className="staff-live-note"><strong>Staff note: </strong>{event.note}</p>}
+      </article>) : <p>No decision has been recorded.</p>}
     </details>
-    {encoder && <EncoderEvidence encoder={encoder} />}
   </div>;
 }
 
 export function EncoderEvidence({ encoder }: {encoder: EncoderReceiptV1}) {
-  return <section className="registry-encoder"><h3>Encoded by</h3>
+  return <details className="registry-encoder"><summary>Profile entry details</summary>
       <p className="registry-encoder-name">{displayLabel(encoder.actorLabel)}</p><p className="registry-review-meta">{positionLabel(encoder.position)}<br /><time dateTime={encoder.recordedAt}>{manilaTime(encoder.recordedAt)} (PH)</time></p>
-      <details><summary>About this entry</summary><p>This records the staff member who encoded the profile. It is not a youth or guardian consent receipt.</p></details>
-    </section>;
+      <p className="field-hint">Entered by this staff member. Review decisions appear in Review history.</p>
+    </details>;
 }

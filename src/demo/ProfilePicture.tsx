@@ -47,7 +47,7 @@ export default function ProfilePicture({ name, pending = false }: { name: string
     <div className="profile-picture-controls"><h2 id="picture-title">Profile picture</h2>
       <div className="picture-actions"><LoadingAction className="secondary-button" type="button" busy={loading} disabled={pending} onClick={() => picker.current?.click()}>{pending ? <SkeletonText>Upload photo</SkeletonText> : practice.profilePicture ? 'Change photo' : 'Upload photo'}</LoadingAction>{!pending && practice.profilePicture && <button className="text-button" type="button" onClick={() => { request.current++; try { practice.setProfilePicture(null); setError(''); } catch { setError('Your browser could not remove the saved photo. Try again.'); } setLoading(false); }}>Remove</button>}</div>
       <input ref={picker} hidden type="file" accept="image/jpeg,image/png,image/webp" aria-label="Choose profile picture" aria-describedby="picture-hint" disabled={loading} onChange={choose} />
-      <p className="field-hint" id="picture-hint">JPG, PNG or WebP · Maximum 2 MB · Saved in this browser only. Your photo does not sync to other devices and is removed if you clear browser storage.</p>
+      <p className="field-hint" id="picture-hint">JPG, PNG or WebP, up to 2 MB. Saved only in this browser; it won’t sync to other devices and may be lost if you clear browser data.</p>
       {error && <p className="picture-feedback" role="alert">{error}</p>}
       <span className="sr-only" role="status">{loading ? 'Reading image' : practice.profilePicture ? 'Profile picture selected' : ''}</span>
     </div>

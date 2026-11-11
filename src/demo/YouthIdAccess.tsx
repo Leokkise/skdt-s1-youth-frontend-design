@@ -1,7 +1,5 @@
-import { SkeletonText } from './StaffLoading';
 import LoadingAction from './LoadingAction';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import StatusToast from './StatusToast';
+import { useEffect, useRef, useState } from 'react';
 import type { Answers } from '../profiling/fields';
 import { useYouthAuth } from '../auth/AuthProvider';
 import { correctionService, reviewService } from '../auth/review-services';
@@ -15,13 +13,11 @@ export default function YouthIdAccess({ approved, responseId, answers, registrat
   const practice = usePractice();
   const [card, setCard] = useState<{answers: Answers; registration?: string | null} | null>(null);
   const [busy, setBusy] = useState(false), [error, setError] = useState('');
-  const [notice, setNotice] = useState(0);
-  const dismissNotice = useCallback(() => setNotice(0), []);
   const dialog = useRef<HTMLDialogElement>(null), live = useRef(true), request = useRef(0);
   const identity = state.kind === 'signedIn' ? state.authUserId : null;
   const active = state.kind === 'signedIn' && state.access.accountStatus === 'active' && !signingOut;
   useEffect(() => { live.current = true; return () => { live.current = false; request.current++; }; }, []);
-  useEffect(() => { request.current++; setCard(null); setBusy(false); setNotice(0); dialog.current?.close(); }, [identity, active, approved, responseId]);
+  useEffect(() => { request.current++; setCard(null); setBusy(false); dialog.current?.close(); }, [identity, active, approved, responseId]);
   useEffect(() => { if (card) dialog.current?.showModal(); }, [card]);
   async function open() {
     if (!active || checking || !approved || !responseId || busy) return;
@@ -36,9 +32,8 @@ export default function YouthIdAccess({ approved, responseId, answers, registrat
   }
   return <section className="profile-card dashboard-qr">
     <div className="dashboard-id-heading"><span className="dashboard-card-icon"><YouthIcon name="qr" /></span><h2>Digital Youth ID</h2></div>
-    <p>{pending ? <SkeletonText>Your Digital Youth ID will be available after staff approve your profile.</SkeletonText> : approved ? 'Preview and download your Digital Youth ID with your profile details and QR code.' : 'Your Digital Youth ID will be available after staff approve your profile.'}</p>
-    <LoadingAction className="secondary-button" busy={busy} disabled={pending || !active || checking || (approved && !responseId)} onClick={() => { if (!approved) setNotice(value => value + 1); else void open(); }}>View Digital Youth ID</LoadingAction>
-    {notice > 0 && <StatusToast key={notice} pending message="Your Digital Youth ID is not yet available. Staff approval of your profile is required before you can view or download it." onClose={dismissNotice} />}
+    <p>View and download your Digital Youth ID after your profile is approved.</p>
+    {approved ? <LoadingAction className="secondary-button" busy={busy} disabled={pending || !active || checking || !responseId} onClick={() => { void open(); }}>View Digital Youth ID</LoadingAction> : <div className="dashboard-id-pending"><YouthIcon name="clock" /><span>Available after staff approves your profile.</span></div>}
     {error && <p role="alert">{error}</p>}
     <dialog ref={dialog} className="youth-id-dialog" aria-label="Digital Youth ID" onClose={() => setCard(null)}>
       {card && active && approved && <DemoQr onClose={() => dialog.current?.close()} checking={checking} profile={youthQrProfile(card.answers)} picture={practice.profilePicture} cardDetails={{registration: card.registration || undefined, birthdate: card.answers.birthdate, gender: card.answers.gender, contact: card.answers.contactNumber}} />}

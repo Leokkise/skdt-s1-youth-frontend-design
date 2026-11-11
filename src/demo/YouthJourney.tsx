@@ -13,6 +13,10 @@ export const journeySteps = [
 ];
 
 export default function YouthJourney({ status, loading = false, correctionPath = '/youth/profile' }: { correctionPath?: string; loading?: boolean; status?: ReviewStatus | 'unavailable' }) {
+  if (loading) return <section className="youth-journey journey-loading" aria-busy="true" aria-label="Loading profiling progress">
+    <div className="journey-heading"><h2>Your profiling progress</h2><div className="journey-loading-badge" aria-hidden="true" /><div className="journey-loading-description" aria-hidden="true" /></div>
+    <ol aria-hidden="true">{['Account', 'Youth profiling', 'Staff review', 'Review outcome'].map(title => <li key={title}><span className="journey-marker journey-loading-marker" /><div><strong>{title}</strong><span className="journey-loading-detail" /></div></li>)}</ol>
+  </section>;
   const submitted = Boolean(status), changes = status === 'Needs changes';
   const approved = status === 'Approved (demo)', rejected = status === 'Rejected (demo)';
   const final = approved || rejected;
@@ -23,10 +27,10 @@ export default function YouthJourney({ status, loading = false, correctionPath =
     ['Account', 'Signed in'],
     ['Youth profiling', changes ? 'Update requested answers' : submitted ? 'Submitted' : 'Complete and submit your profile'],
     ['Staff review', status === 'unavailable' ? 'Status unavailable — open My profile' : changes ? 'After resubmission' : final ? 'Review completed' : submitted ? 'Awaiting staff review' : 'After submission'],
-    ['Review outcome', final ? status === 'Approved (demo)' ? 'Approved' : 'Rejected — read the staff note' : changes ? 'Changes requested' : 'Awaiting a decision'],
+    ['Review outcome', final ? status === 'Approved (demo)' ? 'Approved' : 'Rejected' : changes ? 'Changes requested' : 'Awaiting a decision'],
   ];
   return <section className="youth-journey" data-review-state={reviewState} data-status={changes ? 'needs-changes' : undefined} aria-labelledby="journey-title" aria-hidden={loading || undefined} inert={loading || undefined}>
-    <div className="journey-heading"><h2 id="journey-title">{changes ? 'Your profile needs changes' : 'Your profiling progress'}</h2><span className="journey-outcome"><YouthIcon name={approved ? 'check' : rejected ? 'close' : changes ? 'edit' : 'clock'} />{outcomeLabel}</span><p>{changes ? 'Staff requested updates to your profile. Read the notes, correct your answers, then resubmit.' : approved ? 'Your profile is approved. You can view your profile and open your Digital Youth ID below.' : rejected ? 'Your profile was rejected. Open My profile to read the staff explanation.' : submitted ? 'Your profile is submitted. Follow its review progress here.' : 'Complete and submit your profile to open your youth dashboard.'}</p>{changes && <Link className="button journey-correction-action" to={correctionPath}><YouthIcon name="edit" />Update requested answers<YouthIcon name="arrow" /></Link>}</div>
+    <div className="journey-heading"><h2 id="journey-title">{changes ? 'Your profile needs changes' : 'Your profiling progress'}</h2><span className="journey-outcome"><YouthIcon name={approved ? 'check' : rejected ? 'close' : changes ? 'edit' : 'clock'} />{outcomeLabel}</span><p>{changes ? 'Staff requested updates to your profile. Read the notes, correct your answers, then resubmit.' : approved ? 'View your details or download your Digital Youth ID below.' : rejected ? 'Your profile was rejected. Open My profile to read the staff explanation.' : status === 'unavailable' ? 'Your review status is unavailable. Open My profile to check again.' : submitted ? 'Your profile was submitted and is waiting for staff review.' : 'Complete and submit your profile to open your youth dashboard.'}</p>{changes && <Link className="button journey-correction-action" to={correctionPath}><YouthIcon name="edit" />Update answers<YouthIcon name="arrow" /></Link>}</div>
     <ol>{steps.map(([title, detail], index) => <li key={title} className={index < current || final ? 'is-complete' : index === current ? 'is-current' : ''} aria-current={index === current ? 'step' : undefined}>
       <span className="journey-marker">{index === 3 && rejected ? <YouthIcon name="close" /> : index === 3 && changes ? <YouthIcon name="edit" /> : index < current || final ? <YouthIcon name="check" /> : index + 1}</span><div><strong>{displayLabel(title)}</strong><span>{loading ? <SkeletonText>{detail}</SkeletonText> : detail}</span></div>
     </li>)}</ol>

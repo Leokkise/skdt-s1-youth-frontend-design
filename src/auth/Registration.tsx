@@ -83,12 +83,13 @@ export default function Registration() {
   }
   function submit(event: FormEvent) { event.preventDefault(); void act(); }
   const finished = stage === 'complete' || stage === 'existing';
-  return <main id="main-content" className="container account-main"><Link className="back-link" to="/youth" onClick={clear}>← Back to home</Link>
+  return <main id="main-content" className="container account-main">
     <section className={`profile-card account-preview account-form account-registration${stage === 'complete' ? ' registration-complete' : ''}`} aria-labelledby="registration-title">
       <h1 id="registration-title">{stage === 'code' ? 'Confirm email' : stage === 'password' ? 'Set password' : stage === 'complete' ? 'Registration complete' : stage === 'existing' ? 'Account already registered' : 'Create account'}{stage === 'complete' && <span className="registration-success-icon" aria-hidden="true"><YouthIcon name="check" /></span>}</h1>
       {stage === 'code' && <p>Enter the six-digit code sent to <strong>{email.trim()}</strong>. It expires in 10 minutes.</p>}
       {stage === 'password' && <p>Email ownership verified. Re-enter your desired password to finish registration.</p>}
       {stage === 'complete' && <p role="status">Your account is ready. Sign in to start your youth profiling.</p>}
+      {stage === 'complete' && <Link className="button signin-home" to="/youth/demo/sign-in" onClick={clear}>Continue to sign in<YouthIcon name="arrow" /></Link>}
       {stage === 'existing' && <p role="status">Your email belongs to an existing account. Sign in or ask staff for recovery assistance.</p>}
       {error && <p className="auth-error" role="alert" tabIndex={-1} ref={alert}>{error}</p>}
       {!finished && <form onSubmit={submit} aria-busy={busy}><fieldset className="auth-fields" disabled={busy || state.kind === 'loading'}><div className="profile-fields">
@@ -97,7 +98,6 @@ export default function Registration() {
         {stage === 'code' && <div className="profile-field wide"><label htmlFor="registration-code">Confirmation code</label><input id="registration-code" autoComplete="one-time-code" inputMode="numeric" pattern="[0-9]{6}" required value={code} onChange={e => setCode(e.target.value)} /></div>}
       </div><div className={`form-actions confirmation-actions${stage === 'code' ? ' confirmation-code-actions' : ''}`}><LoadingAction busy={busy} type="submit">{stage === 'entry' ? 'Create account' : stage === 'code' ? 'Verify' : stage === 'retry' ? 'Retry same password setup' : 'Set password'}</LoadingAction>{stage === 'code' && <button type="button" className="secondary-button" onClick={() => { void act(true); }}>Resend code</button>}</div></fieldset></form>}
       {!finished && stage !== 'entry' && stage !== 'code' && <button className="text-button" type="button" onClick={restart}>Cancel and start again</button>}
-      <Link className={`${stage === 'complete' ? 'button' : 'secondary-button'} signin-home`} to="/youth/demo/sign-in" onClick={clear}>Sign in</Link>
       {stage !== 'code' && stage !== 'complete' && <nav className="account-links" aria-label="Account help"><Link to="/youth/demo/forgot-password" onClick={clear}>Forgot password?</Link><Link to="/youth/account-help" onClick={clear}>Contact staff for help</Link></nav>}
     </section></main>;
 }

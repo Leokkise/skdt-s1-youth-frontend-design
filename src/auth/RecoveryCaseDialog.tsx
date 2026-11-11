@@ -38,7 +38,7 @@ export default function RecoveryCaseDialog({ record, reference, busy, blocked, e
     <div className="recovery-case-body" aria-busy={busy} inert={blocked || undefined}>
       {error && <p role="alert" className="auth-error">{error}</p>}{message && !item && <p role="status" className="demo-feedback">{message}</p>}
       {!item && busy && <span className="sr-only" role="status" aria-label="Loading recovery case…">Loading recovery case…</span>}
-      {(!item && !busy) ? <p>Case details could not be confirmed. Use Refresh case to try again.</p> : <>
+      {(!item && !busy) ? <p>Case details could not be loaded. Try again.</p> : <>
         {item?.status !== 'completed' && <div className="recovery-case-outcome"><span className="status-pill staff-event-tone" data-tone={tone}><YouthIcon name={tone === 'success' ? 'check' : tone === 'closed' ? 'close' : 'clock'} />{item ? recoveryStatusLabel(item.status) : <SkeletonText>Awaiting new email verification</SkeletonText>}</span></div>}
         {item && <section className="recovery-case-next" aria-labelledby="recovery-case-next-title"><div className="recovery-case-next-heading"><h3 id="recovery-case-next-title">{item.status === 'completed' ? 'Email change complete' : ['cancelled','expired'].includes(item.status) ? 'This case is closed' : 'Next step'}</h3></div><p>{item.status === 'completed' ? 'The replacement email is now the sign-in email. If the youth needs a new password, they can use Forgot password on the sign-in page with this email.' : ['approved','awaiting_mailbox'].includes(item.status) ? 'Waiting for the youth to verify the replacement email using the message in their new inbox. The previous email remains active until verification is complete.' : ['verified','applying'].includes(item.status) ? 'The new email has been verified. Use Check and finalize email change below to confirm completion.' : 'No further action is available on this case.'}</p></section>}
         <dl className="recovery-case-facts">
@@ -59,6 +59,6 @@ export default function RecoveryCaseDialog({ record, reference, busy, blocked, e
         </section>
       </>}
     </div>
-    <footer className="recovery-case-footer"><span className="field-hint">Auto-refreshes every 15 seconds while visible. Pauses on errors.</span><LoadingAction className="secondary-button" type="button" busy={busy} disabled={blocked} onClick={refresh}>Refresh case</LoadingAction><button className="button" type="button" onClick={close}>Done</button></footer>
+    {(error || (!record && !busy)) && <footer className="recovery-case-footer"><LoadingAction className="secondary-button" type="button" busy={busy} disabled={blocked} onClick={refresh}>Retry loading case</LoadingAction></footer>}
   </dialog>;
 }

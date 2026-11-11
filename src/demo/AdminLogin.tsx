@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { useYouthAuth } from '../auth/AuthProvider';
 import { canPresentReview } from '../auth/staff-access';
 import StaffSessionNotice from '../auth/StaffSessionNotice';
@@ -28,8 +28,8 @@ export default function AdminLogin() {
         result.kind === 'rateLimited' ? 'Too many attempts. Wait a little, then try again.' : 'Sign-in is unavailable. Check the local service and try again.');
     } finally { setPassword(''); setBusy(false); }
   }
-  return <main id="main-content" className="container account-main"><Link className="back-link" to="/youth">← Back to home</Link>
-    <section className="profile-card account-preview" aria-labelledby="staff-login-title"><h1 id="staff-login-title">Staff login</h1>
+  return <main id="main-content" className="container account-main">
+    <section className="profile-card account-preview staff-login-card" aria-labelledby="staff-login-title"><h1 id="staff-login-title">Staff login</h1>
       <p>Sign in with your assigned Youth Registry account.</p>
       {state.kind === 'signedIn' && <><StaffSessionNotice /><p>This session does not currently have Youth Registry access. Sign in below with your assigned staff account.</p></>}
       {!api && <p role="status">Sign-in is unavailable. Ask the administrator to check the local service, then reload.</p>}

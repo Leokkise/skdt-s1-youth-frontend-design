@@ -4,7 +4,7 @@ import { useYouthAuth } from './AuthProvider';
 import { reviewService } from './review-services';
 import { decisionError } from './review-presentation';
 
-export default function StaffDecision({ detail, resolved, denied, decide = reviewService?.decide }: { detail: Pick<ReviewDetailV2, 'responseId' | 'review'>; resolved: (message: string) => void; denied: () => void; decide?: YouthReviewV2['decide'] }) {
+export default function StaffDecision({ detail, resolved, denied, decide = reviewService?.decide }: { detail: Pick<ReviewDetailV2, 'responseId' | 'review'>; resolved: (message: string, outcome?: ReviewDecisionV2) => void; denied: () => void; decide?: YouthReviewV2['decide'] }) {
   const { state, decisionAttempt, checking } = useYouthAuth();
   const retained = decisionAttempt.current?.responseId === detail.responseId ? decisionAttempt.current : null;
   const [outcome, setOutcome] = useState<ReviewDecisionV2 | ''>(retained?.outcome || '');
@@ -31,7 +31,7 @@ export default function StaffDecision({ detail, resolved, denied, decide = revie
     lock.current = false; setBusy(false);
     if (result.kind === 'unavailable') { setUncertain(true); setError('The result is unconfirmed. Retry the same decision, or reload the saved result. Do not enter a different decision.'); return; }
     decisionAttempt.current = null; setUncertain(false);
-    if (result.kind === 'ok') resolved({approved: 'Youth profile approved successfully.', needs_changes: 'Changes requested for the youth profile.', rejected: 'Youth profile rejected.'}[attempt.outcome]);
+    if (result.kind === 'ok') resolved({approved: 'Youth profile approved successfully.', needs_changes: 'Changes requested for the youth profile.', rejected: 'Youth profile rejected.'}[attempt.outcome], attempt.outcome);
     else if (result.kind === 'conflict') resolved('This record already changed. The saved result has been reloaded; no second decision was added.');
     else if (result.kind === 'denied') denied();
     else setError('The decision was not accepted. Check the outcome and note, then try again.');

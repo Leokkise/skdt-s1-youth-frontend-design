@@ -23,6 +23,7 @@ export default function SavedYouth() {
   return <ProfilingNoticeAccess key={identity}><SavedYouthScreens /></ProfilingNoticeAccess>;
 }
 function SavedYouthScreens() {
+  const { pathname } = useLocation();
   const {state, youthScreenView, notifyProfileChange} = useYouthAuth();
   const identity = state.kind === 'signedIn' ? state.authUserId : null;
   const mounted = useRef(true);
@@ -51,7 +52,7 @@ function SavedYouthScreens() {
   }, [version]);
   const reload = () => setVersion(value => value + 1);
   useAutoRefresh(async () => {
-    if (!correctionService || !mode?.detail || mode.detail.draft) return;
+    if (!correctionService || !mode?.detail || (mode.detail.draft && (pathname === '/youth/profiling' || pathname === '/youth/profile'))) return;
     const result = await correctionService.mine();
     if (!mounted.current) return;
     if (result.kind === 'ok') {
@@ -61,7 +62,7 @@ function SavedYouthScreens() {
       setMode(previous => previous ? {...previous, detail:result.data} : previous); notifyProfileChange();
     } else if (result.kind === 'denied') { youthScreenView.current = null; setMode(null); reload(); }
     else setError('Your review status could not be updated. Refresh to retry.');
-  }, !checking && !!identity && !!mode?.detail && !mode.detail.draft);
+  }, !checking && !!identity && !!mode?.detail && !(mode.detail.draft && (pathname === '/youth/profiling' || pathname === '/youth/profile')));
   if (!mode && !error) return <YouthWorkspacePending />;
   if (!mode) return <main id="main-content" className="container demo-main" aria-busy={!error}>{error ? <><p role="alert">{error}</p><button className="button" onClick={reload}>Retry saved review</button></> : <span className="sr-only" role="status">Loading your profile…</span>}</main>;
   if (mode.detail && mode.options) return <div inert={checking || undefined} aria-busy={checking}>{error && <p role="status">{error}</p>}<CorrectionYouth refreshing={checking} key={mode.detail.responseId} detail={mode.detail} options={mode.options} reload={reload} /></div>;

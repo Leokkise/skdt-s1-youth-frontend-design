@@ -79,7 +79,7 @@ const navigation = [
 
   ['Services', '/youth#services'],
 
-  ['Demographics', '/youth#demographics'], ['Help / FAQ', '/youth#faq'],
+  ['Help / FAQ', '/youth#faq'],
 
   ['Contact', '/youth#contact'],
 
@@ -254,7 +254,7 @@ export function CivicHeader() {
           <div ref={homeMenu} className="civic-home-menu" onFocusCapture={cancelHomeClose} onPointerEnter={event => { if (!open && event.pointerType === 'mouse') { cancelHomeClose(); setHomeOpen(true); } }} onPointerLeave={event => { if (!open && event.pointerType === 'mouse' && !homeMenu.current?.contains(document.activeElement)) { cancelHomeClose(); homeCloseTimer.current = window.setTimeout(() => { setHomeOpen(false); homeCloseTimer.current = null; }, 240); } }}>
             <div className="civic-home-controls">
               <Link to="/youth" aria-current={isLanding && activeSection === 'home' ? 'location' : undefined} onClick={returnHome}>Home</Link>
-              <button ref={homeToggle} type="button" className="civic-home-toggle" aria-label="Home sections" aria-expanded={homeOpen} aria-controls="home-sections" onClick={() => { cancelHomeClose(); setHomeOpen(value => !value); }}><HeaderChevron /></button>
+              <button ref={homeToggle} type="button" className="civic-home-toggle" aria-label={homeOpen ? 'Collapse Home menu' : 'Expand Home menu'} aria-expanded={homeOpen} aria-controls="home-sections" onClick={() => { cancelHomeClose(); setHomeOpen(value => !value); }}><HeaderChevron /></button>
             </div>
             <div id="home-sections" className="civic-home-dropdown" hidden={!homeOpen}>
               {navigation.map(([label, url]) => <Link key={label} to={url} aria-current={isLanding && activeSection === url.split('#')[1] ? 'location' : undefined} onClick={() => { setOpen(false); setHomeOpen(false); }}>{label}</Link>)}
@@ -269,7 +269,7 @@ export function CivicHeader() {
 
       <div className="civic-header-actions">
 
-        {isStaff ? practice.adminSignedIn && <Link className="civic-login" to="/admin/youth/login" onClick={practice.adminSignOut}>Staff sign out</Link> : youthState.kind === "signedIn" || practice.signedIn ? <UserMenu /> : youthState.kind === 'loading' ? <button className="user-menu-trigger" disabled aria-label="Restoring account"><span className="user-avatar" aria-hidden="true"><span className="account-name-placeholder avatar" /></span><span className="account-name-placeholder" aria-hidden="true" /><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4 6 4 4 4-4" stroke="currentColor" strokeWidth="2" /></svg></button> : <Link className="civic-login" to="/youth/demo/sign-in"><span>Login / Sign up</span><CivicIcon name="arrow" /></Link>}
+        {isStaff ? practice.adminSignedIn && <Link className="civic-login" to="/admin/youth/login" onClick={practice.adminSignOut}>Staff sign out</Link> : youthState.kind === "signedIn" || practice.signedIn ? <UserMenu /> : youthState.kind === 'loading' ? <button className="user-menu-trigger" disabled aria-label="Restoring account"><span className="user-avatar" aria-hidden="true"><span className="account-name-placeholder avatar" /></span><span className="account-name-placeholder" aria-hidden="true" /><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4 6 4 4 4-4" stroke="currentColor" strokeWidth="2" /></svg></button> : <Link className="civic-login" to="/youth/demo/sign-in"><span className="civic-login-full">Login / Sign up</span><span className="civic-login-compact">Sign in</span><CivicIcon name="arrow" /></Link>}
 
         <button ref={toggle} className="civic-menu-toggle" type="button" aria-expanded={open} aria-controls="primary-navigation" aria-label={open ? 'Close navigation' : 'Open navigation'} onClick={() => setOpen(value => !value)}><CivicIcon name={open ? 'close' : 'menu'} /></button>
 
@@ -304,7 +304,7 @@ export function CivicScroll() {
 
 
 type Demographics = { asOf: string; total: number; childYouth: number; coreYouth: number; youngAdult: number };
-const sampleDemographics: Demographics = { asOf: '', total: 474, childYouth: 76, coreYouth: 251, youngAdult: 147 };
+
 
 function CountUp({ value }: { value: number }) {
   const [count, setCount] = useState(value);
@@ -329,7 +329,7 @@ function CountUp({ value }: { value: number }) {
 }
 
 function CommunityDemographics() {
-  const [stats, setStats] = useState<Demographics | null>(client ? null : sampleDemographics);
+  const [stats, setStats] = useState<Demographics | null>(null);
   useEffect(() => {
     const api = client;
     if (!api) return;
@@ -344,17 +344,14 @@ function CommunityDemographics() {
   }, []);
   return <section className="civic-demographics civic-paper" id="demographics" aria-label={client ? 'Youth demographics' : 'Youth demographics · Sample data'}>
     <div className="container">
-      {!stats && <p role="status">Public statistics are currently unavailable.</p>}
-      {stats && <dl className="civic-statistics">
-        <div><CivicIcon name="people" /><dt title="Ages 15–30">Approved youth profiles</dt><dd aria-label={String(stats.total)}><CountUp value={stats.total} /></dd></div>
-        <div><CivicIcon name="youth" /><dt title="Ages 15–17">Child Youth</dt><dd aria-label={String(stats.childYouth)}><CountUp value={stats.childYouth} /></dd></div>
-        <div><CivicIcon name="graduate" /><dt title="Ages 18–24">Core Youth</dt><dd aria-label={String(stats.coreYouth)}><CountUp value={stats.coreYouth} /></dd></div>
-        <div><CivicIcon name="work" /><dt title="Ages 25–30">Young Adult</dt><dd aria-label={String(stats.youngAdult)}><CountUp value={stats.youngAdult} /></dd></div>
-      </dl>}
+      <dl className="civic-statistics">
+        <div><CivicIcon name="people" /><dt>Approved youth profiles</dt><dd aria-label={stats ? String(stats.total) : 'Currently unavailable'}>{stats ? <CountUp value={stats.total} /> : '—'}</dd></div>
+        <div><CivicIcon name="report" /><dt>Transparency &amp; Reports</dt><dd className="civic-stat-pending">Coming soon</dd></div>
+        <div><CivicIcon name="calendar" /><dt>Events &amp; Programs</dt><dd className="civic-stat-pending">Coming soon</dd></div>
+      </dl>
     </div>
   </section>;
 }
-
 
 export default function CivicLanding() {
 
@@ -377,13 +374,13 @@ export default function CivicLanding() {
 
       <div className="container civic-hero-content">
 
-        <h1 id="page-title">Kabataang Talipapa.<br /><span>Kasama sa pag-unlad.</span></h1>
+        <h1 id="page-title">Kabataang Talipapa.<br /><span>Kasama sa pag‑unlad.</span></h1>
 
-        <p>The Sangguniang Kabataan of Barangay Talipapa,<br className="desktop-break" /> District 6, Quezon City.</p>
+        <p>The Sangguniang Kabataan of Barangay Talipapa,<br className="desktop-break" /> District 6, Quezon&nbsp;City.</p>
 
 
 
-        <div className="civic-hero-actions"><Link className="button civic-primary" to={profilingTarget}>{hasSubmittedProfile ? 'Go to youth dashboard' : 'Start youth profiling'}<CivicIcon name="arrow" /></Link><Link className="civic-hero-secondary" to="/youth#services">Explore our services</Link></div>
+        <div className="civic-hero-actions"><Link className="button civic-primary" to={profilingTarget}>{hasSubmittedProfile ? 'Visit youth dashboard' : 'Start youth profiling'}<CivicIcon name="arrow" /></Link><Link className="civic-hero-secondary" to="/youth#services">Explore services</Link></div>
 
 
       </div>
@@ -400,11 +397,11 @@ export default function CivicLanding() {
       <div className="civic-service-grid">
 
         {([
-          { id: 'profiling', title: 'Youth Profiling', description: 'Your profile. Your interests. A voice in youth programs.', icon: 'profile' },
-          { id: 'transparency', title: 'Transparency & Projects', description: 'Follow SK budgets, project updates, and public reports.', icon: 'report' },
-          { id: 'events', title: 'Events & Programs', description: 'Sports, workshops, and activities for Kabataang Talipapa.', icon: 'calendar' },
+          { id: 'profiling', title: 'Youth Profiling', description: 'Fill out your youth profile and check if staff have approved it.', icon: 'profile' },
+          { id: 'transparency', title: 'Transparency & Projects', description: 'View SK budgets, reports, and project updates here soon.', icon: 'report' },
+          { id: 'events', title: 'Events & Programs', description: 'Find youth activities and community events here soon.', icon: 'calendar' },
         ] as const).map(card => {
-          const action = resolvingAccount ? 'Checking account…' : !signedIn ? 'Sign in to explore' : card.id === 'profiling' ? hasSubmittedProfile ? 'Open your dashboard' : 'Complete your profile' : 'See what’s coming';
+          const action = accountState.kind === 'loading' ? 'Checking account…' : !signedIn ? 'Sign in to explore' : card.id === 'profiling' ? hasSubmittedProfile ? 'Open your dashboard' : 'Complete your profile' : 'See what’s coming';
           const titleId = `service-${card.id}-title`, actionId = `service-${card.id}-action`;
           return <article className="civic-service-card" key={card.id}>
             <div className={`civic-service-art art-${card.id}`} aria-hidden="true" />
@@ -429,7 +426,7 @@ export default function CivicLanding() {
 
 
     <section className="civic-how-it-works civic-paper" id="how-it-works" aria-labelledby="how-it-works-title">
-      <div className="container"><div className="civic-section-heading"><div><h2 id="how-it-works-title">How it works</h2><p>New here? Start with an account, then share your youth profile.</p></div><Link className="button how-start-cta" to={profilingTarget}>{hasSubmittedProfile ? 'Go to youth dashboard' : 'Start youth profiling'}<CivicIcon name="arrow" /></Link></div>
+      <div className="container"><div className="civic-section-heading"><div><h2 id="how-it-works-title">How it works</h2><p>Create an account, fill out your profile, and send it to staff for review.</p></div><Link className="button how-start-cta" to={profilingTarget}>{hasSubmittedProfile ? 'Visit youth dashboard' : 'Start youth profiling'}<CivicIcon name="arrow" /></Link></div>
         <ol role="list">{landingSteps.map(([title, description], index) => <li key={title}><span className="how-step-marker" aria-hidden="true">{index === 3 ? <CivicIcon name="calendar" /> : <YouthIcon name={(['account', 'edit', 'clock'] as const)[index]} />}<small>{index + 1}</small></span><div className="how-step-copy"><h3>{title}</h3><p>{description}</p></div></li>)}</ol>
 
       </div>
@@ -440,9 +437,9 @@ export default function CivicLanding() {
     <section className="civic-faq civic-paper" id="faq" aria-labelledby="faq-title">
       <div className="container civic-faq-layout">
 
-      <div className="civic-faq-intro"><div><h2 id="faq-title">How can we help?</h2><p>Get answers to common questions about youth profiling, submitting your information, and following your staff review status. Learn how to update your profile and manage your account.</p></div><Link className="button how-start-cta" to="/youth#contact">Contact barangay staff<CivicIcon name="arrow" /></Link></div>
+      <div className="civic-faq-intro"><div><h2 id="faq-title">How can we help?</h2><p>Find answers about youth profiling, review status, and your account.</p></div><Link className="button how-start-cta" to="/youth#contact">Contact barangay<CivicIcon name="arrow" /></Link></div>
 
-      <div className="civic-faq-questions"><FAQ limit={6} /></div>
+      <div className="civic-faq-questions"><FAQ /></div>
       </div>
     </section>
 
@@ -458,7 +455,7 @@ export default function CivicLanding() {
 
           <div className="civic-location"><CivicIcon name="phone" /><div><h3>Contact number</h3><p>0917 000 0000</p></div></div>
 
-          <div className="civic-location"><CivicIcon name="mail" /><div><h3>Email address</h3><p>hello@talipapa.example</p></div></div>
+          <div className="civic-location"><CivicIcon name="mail" /><div><h3>Email address</h3><p>barangay.talipapa2018@gmail.com</p></div></div>
         </div>
 
         <figure className="civic-map"><a className="civic-map-link" href={mapLink} target="_blank" rel="noreferrer">Open in Google Maps<CivicIcon name="arrow" /></a><iframe title="Google map of the Barangay Talipapa area in Quezon City" src={`https://www.google.com/maps?q=${barangayCenter}&z=16&output=embed`} loading="lazy" referrerPolicy="no-referrer" allowFullScreen /></figure>
@@ -479,16 +476,17 @@ export function CivicFooter() {
 
     <div className="container civic-footer-grid">
 
-      <div className="civic-footer-about"><Link className="civic-brand" to="/youth"><img src={seal} alt="SK Barangay Talipapa seal" width="64" height="64" loading="lazy" /><span><strong>Sangguniang Kabataan</strong><small>Barangay Talipapa · District 6, Quezon City</small></span></Link><p>Youth participation. Community progress.</p><span className="civic-footer-product">SK-DigiTalipapa</span></div>
+      <div className="civic-footer-about"><Link className="civic-brand" to="/youth"><img src={seal} alt="SK Barangay Talipapa seal" width="64" height="64" loading="lazy" /><span><strong>Sangguniang Kabataan</strong><small>Barangay Talipapa · District 6, Quezon City</small></span></Link><p>Helping Kabataang Talipapa share their voices, discover opportunities, and build a more connected community.</p></div>
 
 
 
-      <div className="civic-footer-contact"><h2>Contact us</h2><p>{officeAddress}</p><div className="civic-contact-sample"><p>hello@talipapa.example<br />Phone: (02) 0000 0000<br />Monday–Friday, 8 AM–5 PM</p></div><Link className="civic-footer-contact-link" to="/youth#contact">Location &amp; directions<CivicIcon name="arrow" /></Link></div>
-      <div className="civic-footer-social"><h2>Social links</h2><div className="civic-social-pending"><a href={barangayFacebook} target="_blank" rel="noreferrer"><CivicIcon name="facebook" />SK Talipapa Facebook<CivicIcon name="arrow" /></a></div></div>
+      <div className="civic-footer-quick"><h2>Quick links</h2><nav aria-label="Footer quick links"><Link to="/youth">Home</Link><Link to="/youth#services">Youth services</Link><Link to="/youth#how-it-works">How it works</Link><Link to="/youth#faq">Help / FAQ</Link><Link to="/youth#contact">Contact</Link></nav></div>
+      <div className="civic-footer-contact"><h2>Contact us</h2><p>{officeAddress}</p><div className="civic-contact-sample"><p>barangay.talipapa2018@gmail.com<br />Phone: (02) 0000 0000<br />Monday–Friday, 8 AM–5 PM</p></div><Link className="civic-footer-contact-link" to="/youth#contact">Location &amp; directions<CivicIcon name="arrow" /></Link></div>
+      <div className="civic-footer-social"><h2>Social links</h2><div className="civic-footer-social-list"><a href={barangayFacebook} target="_blank" rel="noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.51 1.49-3.9 3.77-3.9 1.09 0 2.23.2 2.23.2v2.46h-1.26c-1.24 0-1.62.77-1.62 1.56V12h2.77l-.44 2.89h-2.33v6.99A10 10 0 0 0 22 12Z" /></svg><span>SK Talipapa Facebook</span><CivicIcon name="arrow" /></a><span className="civic-social-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg><span>Instagram <small>Coming soon</small></span></span><span className="civic-social-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="m10 9 5 3-5 3Z" fill="currentColor" stroke="none"/></svg><span>YouTube <small>Coming soon</small></span></span></div></div>
 
     </div>
 
-    <div className="container civic-footer-bottom"><p>© {new Date().getFullYear()} SK-DigiTalipapa · Sangguniang Kabataan of Barangay Talipapa</p><nav className="civic-footer-legal" aria-label="Policies"><Link to="/youth/terms">Terms of Service</Link><Link to="/youth/privacy">Privacy Policy</Link><Link to="/youth/accessibility">Accessibility</Link></nav></div>
+    <div className="container civic-footer-bottom"><p>© {new Date().getFullYear()} SK-DigiTalipapa · Sangguniang Kabataan of Barangay Talipapa</p><nav className="civic-footer-legal" aria-label="Policies"><span>Terms of Service</span><span>Privacy Policy</span><Link to="/admin/youth/login">Staff access</Link></nav></div>
 
   </footer>;
 

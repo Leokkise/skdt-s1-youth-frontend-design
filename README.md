@@ -1,6 +1,6 @@
 # SK-DigiTalipapa frontend design handoff
 
-Standalone React / TypeScript / Vite design workspace with fictional data. Prepared from the current local S1 frontend on 2026-11-09, including uncommitted UI edits. Original source HEAD was 600df21562ba98f5285976108426de6796183d12.
+Standalone React / TypeScript / Vite design workspace with fictional data. Prepared from the current local S1 frontend on 2026-11-09, including uncommitted UI edits. The current design was synchronized from S1 frontend commit b5037b5. This repository uses its own fictional preview routes.
 
 ## Run locally
 
@@ -11,7 +11,7 @@ npm ci
 npm run dev
 ```
 
-Open the localhost URL printed by Vite. Use the yellow preview navigation to browse youth and staff designs. Profiling and registry interactions use memory and reset on reload. Submit a fictional example profile to populate the youth profile view.
+Open the localhost URL printed by Vite. Browse the youth preview at /youth/dashboard and the fictional staff registry at /admin/youth/demo. Profiling and registry interactions use memory and reset on reload. Submit a fictional example profile to populate the youth profile view.
 
 ## Design scope
 

@@ -3,8 +3,8 @@ import YouthIcon from '../demo/YouthIcon';
 import { ageAt } from './validation';
 
 export type SiblingBirthdateRow = { name: string; birthdate?: string; age: string };
-export default function SiblingBirthdateEditor({ rows, referenceDate, onChange, disabled = false }: {
-  rows: SiblingBirthdateRow[]; referenceDate: string; onChange: (rows: SiblingBirthdateRow[]) => void; disabled?: boolean;
+export default function SiblingBirthdateEditor({ rows, referenceDate, onChange, disabled = false, error }: {
+  rows: SiblingBirthdateRow[]; referenceDate: string; onChange: (rows: SiblingBirthdateRow[]) => void; disabled?: boolean; error?: string;
 }) {
   const id = useId();
   function change(index: number, patch: Partial<SiblingBirthdateRow>) {
@@ -15,7 +15,7 @@ export default function SiblingBirthdateEditor({ rows, referenceDate, onChange, 
       return next;
     }));
   }
-  return <fieldset className="profile-field wide sibling-fields" disabled={disabled}><legend>Siblings <span className="field-optional">(Optional)</span></legend>
+  return <fieldset id="siblings" tabIndex={-1} className="profile-field wide sibling-fields" disabled={disabled} aria-describedby={error ? `${id}-error` : undefined}><legend>Siblings <span className="field-optional">(Optional)</span></legend>
     {rows.map((row, index) => <div className="sibling-row sibling-birthdate-row" key={index}>
       <div className="profile-field"><label htmlFor={`${id}-name-${index}`}>Sibling name {index + 1}</label><input id={`${id}-name-${index}`} value={row.name} onChange={event => change(index, { name: event.target.value })} /></div>
       <div className="profile-field"><label htmlFor={`${id}-birthdate-${index}`}>Birthdate</label><input id={`${id}-birthdate-${index}`} type="date" max={referenceDate} value={row.birthdate || ''} onChange={event => change(index, { birthdate: event.target.value })} /></div>
@@ -23,5 +23,6 @@ export default function SiblingBirthdateEditor({ rows, referenceDate, onChange, 
       <button className="text-button" type="button" aria-label={`Remove sibling ${index + 1}`} onClick={() => onChange(rows.length > 1 ? rows.filter((_, position) => position !== index) : [{ name: '', birthdate: '', age: '' }])}><YouthIcon name="close" /></button>
     </div>)}
     <button className="secondary-button" type="button" disabled={rows.length >= 20} onClick={() => onChange([...rows, { name: '', birthdate: '', age: '' }])}><YouthIcon name="plus" />Add sibling</button>
+    {error && <p className="field-error" id={`${id}-error`}>{error}</p>}
   </fieldset>;
 }

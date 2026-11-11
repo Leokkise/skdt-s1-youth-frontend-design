@@ -1,3 +1,4 @@
+import YouthJourney from './YouthJourney';
 import YouthDashboardCards from './YouthDashboardCards';
 import { displayLabel } from '../presentation-copy';
 import { Link, Navigate } from 'react-router-dom';
@@ -51,7 +52,8 @@ export default function PresentationYouth({ profile = false, saved, reviewStatus
         <ReviewHistory entries={response.history} />
     </>)}
     {!profile && <>
-      <YouthDashboardCards approved={reviewStatus === 'Approved (demo)'} responseId={saved?.responseId} answers={saved?.answers} registration={saved?.kkNumber} hasProfile={Boolean(response)} />
+      <YouthJourney status={saved ? reviewStatus : response?.status} />
+      <YouthDashboardCards needsChanges={response?.status === 'Needs changes'} approved={reviewStatus === 'Approved (demo)'} responseId={saved?.responseId} answers={saved?.answers} registration={saved?.kkNumber} hasProfile={Boolean(response)} />
     </>}
   </main>;
 }

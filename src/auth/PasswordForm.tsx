@@ -70,7 +70,7 @@ export default function PasswordForm({ recovery = false, embedded = false }: { r
   const Heading = embedded ? 'h3' : 'h1';
   return <section className={embedded ? 'settings-password-form' : 'profile-card account-preview account-form'} aria-labelledby="password-title">
     {!embedded && <Heading id="password-title">{recovery ? 'Forgot password' : 'Change password'}</Heading>}
-    <p>{recovery ? stage === 'request' ? 'Enter your email to receive a recovery code.' : stage === 'code' ? 'Enter the six-digit code from your email.' : 'Choose your new password.' : 'Enter your current password to confirm this change. You’ll stay signed in after updating it.'}</p>
+    {recovery && <p>{stage === 'request' ? 'Enter your email to receive a recovery code.' : stage === 'code' ? 'Enter the six-digit code from your email.' : 'Choose your new password.'}</p>}
     {message && (recovery ? <p role="status">{message}</p> : <StatusToast message={message} onClose={dismissMessage} />)}
     {error && <p ref={alert} tabIndex={-1} role="alert" className="auth-error">{error}</p>}
     {cleanup ? <button className="button" onClick={() => window.location.assign('/youth/demo/sign-in')}>Reload and check sign-in</button> : <form onSubmit={submit}>
@@ -87,7 +87,6 @@ export default function PasswordForm({ recovery = false, embedded = false }: { r
       {recovery && stage === 'code' && <section className="password-code-help" aria-labelledby="password-code-help-title"><h2 id="password-code-help-title">Didn’t receive a code?</h2><p>Check spam or request a new code.</p><LoadingAction className="secondary-button" type="button" busy={restarting} onClick={() => { void resend(); }}>Send a new code</LoadingAction></section>}
       </fieldset>
     </form>}
-    {recovery && <Link className="secondary-button signin-home" to="/youth/demo/sign-in">Back to sign in</Link>}
-    <nav className="account-links" aria-label="Account help">{!recovery && <Link to="/youth/account">Back to my account</Link>}{recovery && <Link to="/youth/account-help">Can’t access your email?</Link>}</nav>
+    {recovery && <nav className="account-links" aria-label="Account help"><Link to="/youth/account-help">Can’t access your email?</Link></nav>}
   </section>;
 }

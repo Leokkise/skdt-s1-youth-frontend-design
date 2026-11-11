@@ -4,7 +4,7 @@ import { usePractice } from '../demo/PracticeStore';
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { allFields, sections, visibleFields, siblingRows, displayAnswer, addressSuggestions, TALIPAPA_LOCALITY, type Answers, type Field } from './fields';
-import { changeAnswer, normalizeMobile, profilingDate, syntheticAnswers, validate } from './validation';
+import { changeAnswer, hasDraftAnswers, normalizeMobile, profilingDate, syntheticAnswers, validate } from './validation';
 import PrivacyGate from './PrivacyNotice';
 import AddressAutocomplete from './AddressAutocomplete';
 import YouthIcon from '../demo/YouthIcon';
@@ -43,9 +43,11 @@ export default function ProfilingForm({ saved, siblingDates = false, serverDate,
   const [editingSection, setEditingSection] = useState(false);
   const [reviewCertification, setReviewCertification] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [draftMessage, setDraftMessage] = useState('');
   const [complete, setComplete] = useState(false);
   const heading = useRef<HTMLHeadingElement>(null);
   const errorSummary = useRef<HTMLDivElement>(null);
+  const focusErrors = useRef(false);
   const mounted = useRef(false);
   const form = useRef<HTMLFormElement>(null);
   const focusFrame = useRef<number | null>(null);
@@ -85,10 +87,12 @@ export default function ProfilingForm({ saved, siblingDates = false, serverDate,
     mounted.current = true;
   }, [step, complete]);
   useEffect(() => {
-    if (!Object.keys(errors).length) return;
+    if (!focusErrors.current || !Object.keys(errors).length) return;
+    focusErrors.current = false;
     const certification = errors.certification ? document.getElementById('certification') : null;
     if (certification) { certification.focus({preventScroll: true}); certification.scrollIntoView({block: 'center', behavior: 'instant'}); }
-    else errorSummary.current?.focus();
+    else if (step === sections.length) errorSummary.current?.focus();
+    else { const first = Object.keys(errors)[0]; document.getElementById(first === 'age' || first === 'ageGroup' ? 'birthdate' : first)?.focus(); }
   }, [errors]);
   useEffect(() => {
     if (!consented || !target) return;
@@ -99,15 +103,17 @@ export default function ProfilingForm({ saved, siblingDates = false, serverDate,
   const summaryErrors = Object.entries(errors).filter(([id]) => id !== 'certification');
   function update(id: string, value: string) {
     if (formBusy || formUncertain) return;
+    setDraftMessage('');
     setAnswers(previous => changeAnswer(previous, id, value, referenceDate));
     if (id === 'certification' && value === 'true') setCertificationToast(0);
-    setErrors({});
+    setErrors(previous => { const next = { ...previous }; delete next[id]; if (id === 'birthdate') { delete next.age; delete next.ageGroup; } return next; });
   }
   function advance() {
     if (formBusy || formUncertain) return;
     const prepared = saved ? { ...answers, ...savedAnswers(answers, profilingDate()) } : answers;
     const nextErrors = validate(prepared, saved ? profilingDate() : referenceDate, review ? allFields : sections[step].fields);
     if (saved) setAnswers(prepared);
+    focusErrors.current = Object.keys(nextErrors).length > 0;
     setErrors(nextErrors);
     if (review && nextErrors.certification) setCertificationToast(value => value + 1);
     if (Object.keys(nextErrors).length) return;
@@ -129,34 +135,35 @@ export default function ProfilingForm({ saved, siblingDates = false, serverDate,
   function edit(index: number) { if (formBusy || formUncertain) return; setErrors({}); if (review) setReviewCertification(true); setEditingSection(review); setStep(index); }
   function renderField(field: Field) {
     const error = errors[field.id];
-    const describedBy = [field.hint && `${field.id}-hint`, error && field.id !== 'certification' && `${field.id}-error`].filter(Boolean).join(' ') || undefined;
+    const hint = field.id === 'certification' ? ((reviewCertification || correction) && answers.certification !== 'true' ? 'Please check the box again to certify your updated answers before submitting.' : undefined) : field.hint;
+    const describedBy = [hint && `${field.id}-hint`, error && `${field.id}-error`].filter(Boolean).join(' ') || undefined;
     const required = field.required || (['osyFrom', 'osyTo'].includes(field.id) && answers.isOsy === 'Yes');
     const common = { id: field.id, name: field.id, required, disabled: Boolean(formBusy || formUncertain), 'aria-invalid': Boolean(error), 'aria-describedby': describedBy };
     if (field.id === 'siblings') {
       const rows = siblingRows(answers.siblings);
-      if (siblingDates) return <SiblingBirthdateEditor key={field.id} rows={rows} referenceDate={referenceDate} onChange={rows => update('siblings', JSON.stringify(rows))} disabled={formBusy || formUncertain} />;
+      if (siblingDates) return <SiblingBirthdateEditor key={field.id} rows={rows} referenceDate={referenceDate} onChange={rows => update('siblings', JSON.stringify(rows))} disabled={formBusy || formUncertain} error={error} />;
       return <fieldset className="profile-field wide sibling-fields" key={field.id}><legend>{field.label} <span className="field-optional">(Optional)</span></legend><p id="siblings-hint" className="field-hint">{field.hint}</p>{rows.map((row, index) => <div className="sibling-row" key={index}><div><label htmlFor={index === 0 ? 'siblings' : `sibling-name-${index}`}>Sibling name {index + 1}</label><input id={index === 0 ? 'siblings' : `sibling-name-${index}`} value={row.name} aria-invalid={Boolean(error)} aria-describedby={describedBy} onChange={event => update('siblings', JSON.stringify(rows.map((item, i) => i === index ? { ...item, name: event.target.value } : item)))} /></div><div><label htmlFor={`sibling-age-${index}`}>Age</label><input id={`sibling-age-${index}`} type="number" min={0} max={120} value={row.age} onChange={event => update('siblings', JSON.stringify(rows.map((item, i) => i === index ? { ...item, age: event.target.value } : item)))} /></div><button className="text-button" type="button" aria-label={`Remove sibling ${index + 1}`} onClick={() => update('siblings', JSON.stringify(rows.length > 1 ? rows.filter((_, i) => i !== index) : [{ name: '', age: '' }]))}><YouthIcon name="close" /></button></div>)}<button className="secondary-button" type="button" onClick={() => update('siblings', JSON.stringify([...rows, { name: '', age: '' }]))}><YouthIcon name="plus" /> Add sibling</button>{error && <p className="field-error" id="siblings-error">{error}</p>}</fieldset>;
     }
     return <div className={`profile-field ${field.type === 'textarea' || field.type === 'checkbox' ? 'wide' : ''}`} key={field.id}>
       {field.type === 'checkbox' ? <label className="certification" htmlFor={field.id}>
         <input {...common} type="checkbox" checked={answers[field.id] === 'true'} onChange={event => update(field.id, event.target.checked ? 'true' : '')} />
-        <span>{field.label} <strong>(Required)</strong></span>
+        <span>{field.label} <span className="field-required" aria-hidden="true">*</span><span className="sr-only"> (Required)</span></span>
       </label> : <>
-        <label htmlFor={field.id}>{field.label} <span className="field-optional">{required ? '(Required)' : '(Optional)'}</span></label>
+        <label htmlFor={field.id}>{field.label} {required ? <><span className="field-required" aria-hidden="true">*</span><span className="sr-only"> (Required)</span></> : <span className="field-optional">(Optional)</span>}</label>
         {['age', 'ageGroup', 'locality'].includes(field.id) ? <input {...common} readOnly value={answers[field.id] || ''} /> : field.type === 'select' ? <div className="profile-select"><select {...common} value={answers[field.id] || ''} onChange={event => update(field.id, event.target.value)}>
           <option value="">Select an answer</option>{field.options?.map(option => <option key={option}>{option}</option>)}
         </select><span className="field-dropdown-icon" aria-hidden="true"><YouthIcon name="chevron" /></span></div> : (field.id === 'street' || field.id === 'subdivision') ? <AddressAutocomplete {...common} value={answers[field.id] || ''} suggestions={addressSuggestions[field.id]} onChange={value => update(field.id, value)} /> : field.id === 'contactNumber' ? <div className="mobile-number-control"><span className="mobile-number-prefix">+63</span><input {...common} type="tel" inputMode="numeric" autoComplete="tel-national" maxLength={10} pattern="9[0-9]{9}" placeholder="9XXXXXXXXX" value={(answers.contactNumber || '').replace(/^\+63/, '')} onChange={event => update(field.id, '+63' + event.target.value.replace(/\D/g, ''))} onPaste={event => { event.preventDefault(); const text = event.clipboardData.getData('text'); const normalized = normalizeMobile(text); const digits = /^\+639\d{9}$/.test(normalized) ? normalized.slice(3) : text.replace(/\D/g, ''); update(field.id, '+63' + digits); }} /></div> : field.type === 'textarea' ? <textarea {...common} rows={3} value={answers[field.id] || ''} onChange={event => update(field.id, event.target.value)} /> :
           <input {...common} type={field.type || 'text'} inputMode={field.type === 'number' ? 'numeric' : undefined} min={field.id.startsWith('osy') ? 1900 : undefined} max={field.id.startsWith('osy') ? Number(referenceDate.slice(0, 4)) : field.type === 'date' ? referenceDate : undefined} step={field.type === 'number' ? 1 : undefined} value={answers[field.id] || ''} onInput={field.type === 'date' ? event => update(field.id, event.currentTarget.value) : undefined} onChange={field.type === 'date' ? undefined : event => update(field.id, event.target.value)} />}
       </>}
       <div className="field-feedback">
-        {field.hint && <p className={field.id === 'certification' && answers.certification !== 'true' ? 'field-hint certification-hint-required' : 'field-hint'} id={`${field.id}-hint`}>{field.hint}</p>}
-        {error && field.id !== 'certification' && <p className="field-error" id={`${field.id}-error`}>{error}</p>}
+        {hint && <p className={field.id === 'certification' ? 'field-hint certification-hint-required' : 'field-hint'} id={`${field.id}-hint`}>{hint}</p>}
+        {error && <p className="field-error" id={`${field.id}-error`}>{error}</p>}
       </div>
     </div>;
   }
   if (!loading && existing && !correction) return <Navigate to="/youth/dashboard" replace />;
   return <main id="main-content" className="container profiling-main" data-youth-loading={loading || undefined} aria-busy={formBusy} inert={loading || undefined}>
-    <Link className="back-link dashboard-back-link" to={correction ? '/youth/profile' : '/youth'}>← {correction ? 'My profile' : 'Youth & Community'}</Link>
+    {consented && !complete && (step > 0 || editingSection) ? <button className="back-link dashboard-back-link" type="button" disabled={formBusy || formUncertain} onClick={() => { setErrors({}); if (editingSection) { setEditingSection(false); setStep(sections.length); } else setStep(step - 1); }}>← Back</button> : <Link className="back-link dashboard-back-link" to={correction ? '/youth/profile' : '/youth'}>← Back</Link>}
     <div className="profiling-header">
       <h1>{correction ? 'Correct your youth profile' : 'Youth profiling'}</h1>
       <p>For Barangay Talipapa youth aged 15–30.</p>
@@ -175,8 +182,8 @@ export default function ProfilingForm({ saved, siblingDates = false, serverDate,
           <ol>{[...sections.map(section => section.title), 'Review answers'].map((title, index) => <li key={title} aria-current={step === index ? 'step' : undefined} className={index < step ? 'finished' : ''}>
             <span className="step-number">{index + 1}</span><span>{title}</span>
           </li>)}</ol>
-          <p className="field-hint">Profiling date: {referenceDate}<br />Philippine time (Asia/Manila)</p>
-          <button className="demo-fill" type="button" disabled={formBusy || formUncertain} onClick={() => { setAnswers(previous => ({ ...syntheticAnswers(referenceDate), privacyConsent: previous.privacyConsent, privacyAcceptedAt: previous.privacyAcceptedAt, noticeVersion: previous.noticeVersion })); setStep(0); setEditingSection(false); setErrors({});  }}>Autofill form</button>
+          <div className="profile-sidebar-footer"><p className="field-hint">Profiling date: {referenceDate}</p>
+          <button className="demo-fill" type="button" disabled={formBusy || formUncertain} onClick={() => { setAnswers(previous => ({ ...syntheticAnswers(referenceDate), privacyConsent: previous.privacyConsent, privacyAcceptedAt: previous.privacyAcceptedAt, noticeVersion: previous.noticeVersion })); setStep(0); setEditingSection(false); setErrors({}); setDraftMessage(''); }}>Autofill form</button></div>
         </aside>
         <form ref={form} className="profile-card" noValidate autoComplete="off" onFocusCapture={centerFocusedField} onSubmit={event => { event.preventDefault(); advance(); }}>
           <div className="profiling-section-heading">
@@ -188,7 +195,7 @@ export default function ProfilingForm({ saved, siblingDates = false, serverDate,
           {review && saved?.submissionNotice}
           {formUncertain && <p role="status">Save or submission outcome unknown. Inputs are locked. Check saved record or retry the same submission.</p>}
           {editingSection && <p className="edit-notice">Editing this section only. Continue to return directly to your review; your other answers stay in place.</p>}
-          {summaryErrors.length > 0 && <div className="error-summary" ref={errorSummary} tabIndex={-1} role="alert">
+          {review && summaryErrors.length > 0 && <div className="error-summary" ref={errorSummary} tabIndex={-1} role="alert">
             <strong>Please check {summaryErrors.length} answer(s).</strong>
             <ul>{summaryErrors.map(([id, message]) => <li key={id}><a href={`#${id}`} onClick={event => { event.preventDefault(); if (review) { const index = sections.findIndex(section => section.fields.some(field => field.id === id)); if (index >= 0) { edit(index); requestAnimationFrame(() => document.getElementById(id)?.focus()); } } else document.getElementById(id)?.focus(); }}>{allFields.find(field => field.id === id)?.label}: {message}</a></li>)}</ul>
           </div>}
@@ -197,9 +204,9 @@ export default function ProfilingForm({ saved, siblingDates = false, serverDate,
             <dl>{visibleFields(section.fields, answers).map(field => <div className={field.type === 'textarea' || field.type === 'checkbox' ? 'wide' : ''} key={field.id}><dt>{field.type === 'checkbox' && (reviewCertification || answers[field.id] !== 'true') ? 'Confirm your updated answers' : field.label}</dt><dd>{field.type === 'checkbox' ? reviewCertification || answers[field.id] !== 'true' ? renderField(field) : 'Accepted' : displayAnswer(field.id, answers)}</dd></div>)}</dl>
           </section>)}</div> : <div className="profile-fields">{visibleFields(sections[step].fields, answers).map(renderField)}</div>}
           {certificationToast > 0 && <StatusToast key={certificationToast} pending message="Please check the certification box again after editing your answers, then submit your profile." onClose={dismissCertificationToast} />}
+          {draftMessage && <p className="field-error" role="alert">{draftMessage}</p>}
           <div className="form-actions" aria-busy={formBusy}>
-            {step > 0 && !editingSection && <button className="secondary-button" type="button" disabled={formBusy || formUncertain} onClick={() => { setErrors({}); setStep(step - 1); }}>Back</button>}
-            {(saved || loading) && <LoadingAction className="secondary-button" type="button" busy={pendingAction === 'save' && formBusy} disabled={formBusy || saved?.uncertain || saved?.writesBlocked} onClick={() => { if (!saved) return; setPendingAction('save'); void saved.save(answers).finally(() => setPendingAction(null)); }}>Save draft</LoadingAction>}
+            {(saved || loading) && <LoadingAction className="secondary-button" type="button" busy={pendingAction === 'save' && formBusy} disabled={formBusy || saved?.uncertain || saved?.writesBlocked} onClick={() => { if (!saved) return; if (!hasDraftAnswers(answers)) { setDraftMessage('Please fill in at least one answer before saving your draft.'); return; } setDraftMessage(''); setPendingAction('save'); void saved.save(answers).finally(() => setPendingAction(null)); }}>Save draft</LoadingAction>}
             {!formUncertain && <LoadingAction busy={pendingAction === 'submit' && formBusy} disabled={formBusy || (review && saved?.writesBlocked)} type="submit">{review ? correction ? 'Resubmit corrected profile' : saved || practice.signedIn ? 'Submit profile' : 'Submit answers' : editingSection ? 'Return to review' : step === sections.length - 1 ? 'Review answers' : 'Continue'} <span aria-hidden="true">→</span></LoadingAction>}
             {formUncertain && <LoadingAction busy={formBusy} type="button" onClick={() => { void saved?.save(answers, true); }}>{saved ? 'Retry same operation' : 'Retry same submission'}</LoadingAction>}
           </div>

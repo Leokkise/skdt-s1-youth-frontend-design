@@ -17,7 +17,6 @@ import AccountPreview from './demo/AccountPreview';
 
 import { BrowserRouter, Navigate, Outlet, Route, Routes, Link, useLocation } from "react-router-dom";
 import CivicLanding, { CivicHeader, CivicFooter, CivicScroll } from './landing/CivicLanding';
-import CivicPaperCorners from './landing/CivicPaperCorners';
 import AdminLogin from './demo/AdminLogin';
 import StaffShell from './demo/StaffShell';
 
@@ -74,8 +73,7 @@ function AppContent() {
           <Route caseSensitive path="/admin/youth/reports" element={<StaffDashboard reports />} />
           <Route caseSensitive path="/admin/youth" element={<Navigate to="/admin/youth/dashboard" replace />} />
           <Route element={
-            <div className="civic-paper civic-paper-framed youth-paper">
-              <CivicPaperCorners />
+            <div className="youth-surface">
               <div className="youth-paper-content"><Outlet /></div>
             </div>
           }>

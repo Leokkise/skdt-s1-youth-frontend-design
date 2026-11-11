@@ -13,6 +13,29 @@ export default function CorrectionEditor({ detail, staff = false, serverDate, si
   detail: CorrectionDetailV1; staff?: boolean; serverDate: string; siblingDates: boolean; reload: () => void; denied: () => void;
 }) {
   const { checking } = useYouthAuth();
+  const editor = useRef<HTMLElement>(null);
+  useEffect(() => {
+    let frame = 0;
+    function revealField() {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const input = document.activeElement;
+        if (!window.matchMedia('(max-width: 800px)').matches || !(input instanceof HTMLElement) || !editor.current?.contains(input) || !input.matches('input:not([type="checkbox"]),select,textarea')) return;
+        const viewport = window.visualViewport;
+        let top = viewport?.offsetTop || 0;
+        const bottom = top + (viewport?.height || window.innerHeight);
+        const header = document.querySelector('.civic-header')?.getBoundingClientRect();
+        if (header && header.top <= top) top = Math.max(top, header.bottom);
+        const rect = input.getBoundingClientRect();
+        const desiredTop = top + Math.max(16, (bottom - top - rect.height) / 2);
+        if (Math.abs(rect.top - desiredTop) > 16) window.scrollBy({top: rect.top - desiredTop, behavior: 'instant'});
+      });
+    }
+    const element = editor.current;
+    element?.addEventListener('focusin', revealField);
+    window.visualViewport?.addEventListener('resize', revealField);
+    return () => { cancelAnimationFrame(frame); element?.removeEventListener('focusin', revealField); window.visualViewport?.removeEventListener('resize', revealField); };
+  }, []);
   const [answers, setAnswers] = useState<Answers>(detail.draft?.answers || {});
   const [accepted, setAccepted] = useState(false), [certified, setCertified] = useState(false);
   const [busy, setBusy] = useState(false), [error, setError] = useState('');
@@ -60,7 +83,7 @@ export default function CorrectionEditor({ detail, staff = false, serverDate, si
     else if (result.kind === 'denied') denied();
     else setError('The server did not accept these answers. Check the requested fields and reload if needed.');
   }
-  return <section className="correction-editor"><h3>{staff ? 'Correct this walk-in profile' : 'Requested corrections'}</h3><p>Use the staff notes below to update your answers. Confirm that your corrected answers are accurate, then resubmit for review.</p>
+  return <section ref={editor} className="correction-editor"><h3>{staff ? 'Correct this walk-in profile' : 'Requested corrections'}</h3><p>Follow the staff notes to correct your answers, confirm accuracy, then resubmit for review.</p>
     {error && <p role="alert" className="auth-error">{error}</p>}
     <fieldset className="auth-fields" disabled={busy || checking || Boolean(pending.current)}>
       {sections.map(section => { const fields = editable.filter(field => section.fields.some(item => item.id === field.id)); if (!fields.length) return null;
@@ -76,7 +99,7 @@ export default function CorrectionEditor({ detail, staff = false, serverDate, si
         })}</div></section>;
       })}
       {staff && <RevisionNotice staff accepted={accepted} onChange={setAccepted} />}
-      <label className="review-sharing-choice"><input type="checkbox" checked={certified} onChange={event => setCertified(event.target.checked)} />I confirm that the corrected answers are accurate to the best of my knowledge.</label>
+      <label className="review-sharing-choice"><input type="checkbox" checked={certified} onChange={event => setCertified(event.target.checked)} />These corrections are accurate to the best of my knowledge.</label>
     </fieldset>
     <div className="form-actions"><LoadingAction busy={busy} disabled={busy || checking || (!pending.current && ((staff && !accepted) || !certified))} onClick={() => { void act(); }}>{unconfirmed ? 'Retry resubmission' : 'Resubmit for review'}</LoadingAction></div>
   </section>;

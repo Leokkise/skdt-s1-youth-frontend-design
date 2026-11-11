@@ -48,7 +48,7 @@ export const sections: { title: string; description: string; fields: Field[] }[]
   { title: 'Your voice & certification', description: 'Help shape future youth programs.', fields: [
     { id: 'suggestions', label: 'Suggested youth projects and activities for your barangay', type: 'textarea' },
     { id: 'message', label: 'Message for the SK Council of Barangay Talipapa', type: 'textarea' },
-    { id: 'certification', label: 'I hereby certify that the above information is true and correct to the best of my knowledge.', type: 'checkbox', required: true, hint: 'Confirm again after editing your answers. This is separate from the privacy consent at entry.' },
+    { id: 'certification', label: 'I hereby certify that the above information is true and correct to the best of my knowledge.', type: 'checkbox', required: true },
   ] },
 ];
 export const allFields = sections.flatMap(section => section.fields);

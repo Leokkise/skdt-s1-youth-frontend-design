@@ -5,7 +5,6 @@ import type { CorrectionDetailV1, CorrectionHistoryV1, CorrectionTargetInputV1 }
 import type { ReviewDecisionV2 } from '../../contracts/v1/youth-review-v2';
 import { sections, allFields, displayAnswer } from '../profiling/fields';
 import ReviewSection from '../demo/ReviewSection';
-import { EncoderEvidence } from '../demo/StaffReviewEvidence';
 import CorrectionFieldPicker from '../demo/CorrectionFieldPicker';
 import { correctionDraftError } from '../demo/correction-draft';
 import { correctionService } from './review-services';
@@ -35,26 +34,31 @@ export default function CorrectionReview({ detail, reload, denied, children, sta
     else setError(staff ? 'Review history could not be loaded. Retry history.' : 'Review history could not be loaded. Use Refresh at the top of your profile to try again.');
   }
   useEffect(() => { void loadHistory(true); }, [detail.responseId, detail.answerRevision, detail.status]);
-  const previousTargets = detail.status === 'pending_review' ? history.find(item => item.answerRevision === detail.answerRevision - 1)?.decision?.targets || [] : [];
-  const shownTargets = detail.status === 'pending_review' && !staff ? [] : targets.length ? targets : previousTargets;
+  const shownTargets = detail.status === 'pending_review' ? [] : targets;
+  const answersByRound = new Map(history.map(item => [item.answerRevision, item.answers]));
+  const latestRound = Math.max(0, ...history.map(item => item.answerRevision));
   const evidence = (
     <div className="registry-evidence-grid correction-evidence youth-review-timeline">
       <details className="review-history registry-history">
-        <summary><span className="registry-history-label"><YouthIcon name="chevron" />Review history</span><span>Round {detail.answerRevision}</span></summary>
+        <summary><span className="registry-history-label"><YouthIcon name="chevron" />Review history</span></summary>
         {error && <p role="alert">{error}</p>}{loading && (history.length ? <span role="status" className="sr-only">Loading review history…</span> : staff ? <p role="status"><LoadingSpinner />Loading review history…</p> : <article className="correction-history-round" role="status" aria-label="Loading review history…"><h4>Round {detail.answerRevision} · {reviewLabel(detail.status)}</h4><p className="registry-review-meta"><SkeletonText>Staff name · Staff position · Review date and time (PH)</SkeletonText></p></article>)}
-        {history.map(item => <article className="correction-history-round" key={item.answerRevision}><header className="correction-round-heading"><h4>Round {item.answerRevision}</h4><span className="status-pill" data-review-status={item.decision?.decision || 'pending_review'}>{reviewLabel(item.decision?.decision || 'pending_review')}</span></header>
+        {history.map(item => <details className="correction-history-round" key={`${latestRound}-${item.answerRevision}`} open={item.answerRevision === latestRound}><summary className="correction-round-heading"><h4>Round {item.answerRevision}</h4><span className="status-pill" data-review-status={item.decision?.decision || 'pending_review'}>{reviewLabel(item.decision?.decision || 'pending_review')}</span></summary>
           <p className="registry-review-meta">{item.decision ? `${displayLabel(item.decision.actorLabel)} · ${positionLabel(item.decision.position)} · ${manilaTime(item.decision.recordedAt)} (PH)` : 'Awaiting a decision'}</p>
-          {item.decision?.note && item.decision.decision !== 'needs_changes' && <p className="staff-live-note"><strong>Overall staff note: </strong>{item.decision.note}</p>}
-          {item.decision?.targets.map(target => <section className="correction-history-field" key={target.fieldId}><h5>{fieldName(target.fieldId)}</h5><p className="staff-live-note"><strong>Staff note: </strong>{target.note}</p><dl className="correction-comparison"><div><dt>Reviewed answer</dt><dd>{displayAnswer(target.fieldId, item.answers)}</dd></div><div><dt>Latest submitted answer</dt><dd>{displayAnswer(target.fieldId, detail.answers)}</dd></div></dl></section>)}
-        </article>)}
+          {item.decision?.note && item.decision.decision !== 'needs_changes' && <p className="staff-live-note"><strong>{item.decision.decision === 'rejected' ? 'Reason for rejection: ' : 'Overall staff note: '}</strong>{item.decision.note}</p>}
+          {item.decision?.targets.map(target => {
+            const nextRound = item.answerRevision + 1;
+            const resubmitted = answersByRound.get(nextRound);
+            return <section className="correction-history-field" key={target.fieldId}><h5>{fieldName(target.fieldId)}</h5><p className="staff-live-note"><strong>Staff note: </strong>{target.note}</p><dl className="correction-comparison"><div><dt>Reviewed answer</dt><dd>{displayAnswer(target.fieldId, item.answers)}</dd></div><div><dt>Resubmitted answer (Round {nextRound})</dt><dd>{resubmitted ? displayAnswer(target.fieldId, resubmitted) : nextRound > detail.answerRevision ? 'Awaiting resubmission' : 'Round snapshot unavailable'}</dd></div></dl></section>;
+          })}
+        </details>)}
         {before !== null && (staff || before !== undefined) && <LoadingAction className="secondary-button" busy={loading} onClick={() => { void loadHistory(); }}>{before === undefined ? 'Retry history' : 'Load earlier rounds'}</LoadingAction>}
       </details>
-      {detail.encoderReceipt && <EncoderEvidence encoder={detail.encoderReceipt} />}
     </div>
   );
   return <>
     {!staff && evidence}
-    {!(!staff && detail.draft && detail.status === 'needs_changes') && detail.status !== 'needs_changes' && detail.decision?.note && !targets.some(target => target.note.trim() === detail.decision!.note.trim()) && <p className="correction-overall-note"><strong>Overall staff note</strong>{detail.decision.note}</p>}
+    {staff && detail.status === 'pending_review' && detail.answerRevision > 1 && <section className="review-resubmitted" role="status"><strong>Resubmitted · Pending review</strong><p>Round {detail.answerRevision} is ready for review. Check the updated answers below; earlier correction notes are in Review history.</p></section>}
+    {!(!staff && detail.draft && detail.status === 'needs_changes') && detail.status !== 'needs_changes' && detail.status !== 'rejected' && detail.decision?.note && !targets.some(target => target.note.trim() === detail.decision!.note.trim()) && <p className="correction-overall-note"><strong>Overall staff note</strong>{detail.decision.note}</p>}
     {detail.answerRevision > 1 && before === undefined && <LoadingAction className="secondary-button" busy={loading} onClick={() => { void loadHistory(); }}>Show previous correction notes and answers</LoadingAction>}
     <div className="review-sections">{sections.map(section => <ReviewSection key={[detail.responseId, detail.answerRevision, section.title, shownTargets.length].join('-')} section={section} answers={detail.answers} targets={!staff && detail.draft && detail.status === 'needs_changes' ? [] : shownTargets}
       initiallyOpen={!shownTargets.length || section.fields.some(field => shownTargets.some(target => target.fieldId === field.id))} />)}</div>

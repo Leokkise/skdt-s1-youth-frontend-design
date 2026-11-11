@@ -22,6 +22,14 @@ export function groupForAge(age: number): string {
   if (age >= 25 && age <= 30) return 'Young Adult (25 - 30 yrs old)';
   return '';
 }
+export function hasDraftAnswers(answers: Answers): boolean {
+  return visibleFields(allFields, answers).some(field => {
+    if (['age', 'ageGroup', 'locality', 'certification'].includes(field.id)) return false;
+    if (field.id === 'contactNumber') return Boolean((answers.contactNumber || '').replace(/\D/g, '').replace(/^63/, ''));
+    if (field.id === 'siblings') return siblingRows(answers.siblings).some(row => Boolean(row.name.trim() || row.age.trim() || row.birthdate?.trim()));
+    return Boolean(answers[field.id]?.trim());
+  });
+}
 export function validate(answers: Answers, referenceDate: string, fields: Field[] = allFields): Record<string, string> {
   const errors: Record<string, string> = {};
   for (const field of visibleFields(fields, answers)) {
@@ -31,9 +39,15 @@ export function validate(answers: Answers, referenceDate: string, fields: Field[
     else if (value && field.options && !field.options.includes(value)) errors[field.id] = 'Please choose one of the listed options.';
   }
   const ids = new Set(fields.map(field => field.id));
+  for (const id of ['surname', 'firstName', 'middleName', 'suffix', 'headOfFamily']) {
+    if (ids.has(id) && answers[id]?.trim() && !/\p{L}/u.test(answers[id])) errors[id] = 'Enter a name containing at least one letter.';
+  }
+  for (const field of visibleFields(fields, answers)) {
+    if (field.type === 'textarea' && answers[field.id]?.trim() && !/[\p{L}\p{N}]/u.test(answers[field.id])) errors[field.id] = 'Enter an answer containing letters or numbers.';
+  }
   if (ids.has('contactNumber') && answers.contactNumber && !/^\+639\d{9}$/.test(normalizeMobile(answers.contactNumber))) errors.contactNumber = 'Enter a Philippine mobile number: +63 followed by 10 digits starting with 9.';
   if (ids.has('locality') && answers.locality !== TALIPAPA_LOCALITY) errors.locality = 'The barangay and city must be Talipapa, Quezon City.';
-  if (ids.has('siblings') && siblingRows(answers.siblings).some(row => (row.name.trim() || row.age) && (!row.name.trim() || !/^\d{1,3}$/.test(row.age) || Number(row.age) > 120))) errors.siblings = 'Complete each sibling’s name and age (0–120), or leave the whole row blank.';
+  if (ids.has('siblings') && siblingRows(answers.siblings).some(row => (row.name.trim() || row.age || row.birthdate) && (!/\p{L}/u.test(row.name) || !/^\d{1,3}$/.test(row.age) || Number(row.age) > 120 || (row.birthdate && ageAt(row.birthdate, referenceDate) !== Number(row.age))))) errors.siblings = 'Complete each sibling’s name and a valid birthdate or age (0–120), or leave the whole row blank.';
   if (ids.has('osyFrom') && answers.isOsy === 'Yes') {
     const year = Number(referenceDate.slice(0, 4));
     for (const id of ['osyFrom', 'osyTo']) if (!/^\d{4}$/.test(answers[id] || '') || Number(answers[id]) < 1900 || Number(answers[id]) > year) errors[id] = `Enter a year from 1900 to ${year}.`;
@@ -45,6 +59,7 @@ export function validate(answers: Answers, referenceDate: string, fields: Field[
   if (ids.has('age') && answers.age) {
     if (!/^\d+$/.test(answers.age) || !Number.isInteger(age) || age < 15 || age > 30) errors.age = 'Age must be a whole number from 15 to 30.';
     else if (calculated !== null && age !== calculated) errors.age = `Your birthdate gives an age of ${calculated} on ${referenceDate}. Please check both answers.`;
+    if (errors.age && ids.has('birthdate') && !errors.birthdate) errors.birthdate = 'Check your birthdate; the eligible age is 15 to 30.';
   }
   if (ids.has('ageGroup') && answers.ageGroup && answers.age && answers.ageGroup !== groupForAge(age)) errors.ageGroup = 'Choose the age group that matches your age.';
   return errors;
